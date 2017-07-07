@@ -96,7 +96,7 @@ let controller =
     function drawTaskViewChart() {
         document.getElementById('figure').innerHTML = '';
 
-        const margin = { top: 50, right: 50, bottom: 50, left: 80 };
+        const margin = { top: 50, right: 50, bottom: 50, left: 120 };
         let barHeight = 18;
         const barPadding = 6;
         const axisFontHeight = 17;
@@ -222,7 +222,7 @@ let controller =
     function drawUserViewChart() {
         document.getElementById('figure').innerHTML = '';
 
-        const margin = { top: 50, right: 50, bottom: 50, left: 80 };
+        const margin = { top: 50, right: 50, bottom: 50, left: 120 };
         let barHeight = 18;
         const barPadding = 6;
         const axisFontHeight = 17;
@@ -351,6 +351,20 @@ let controller =
         isTaskView ? drawTaskViewChart() : drawUserViewChart();
     }
 
+    function fetchCachedDataAndDrawChart() {
+        d3.json(`${manifest.host}/jiracached`, function (error, data) {
+
+            if (error || !data || !data.length) {
+                fetchDataAndDrawChart();
+            } else {
+                hideLoading();
+                cachedData = data;
+                console.log(cachedData);
+                drawChart();
+            }           
+        })
+    }
+
     function fetchDataAndDrawChart() {
         d3.csv(`${manifest.host}/jira?url=${manifest.jiraUrl}`, function (error, data) {
             hideLoading();
@@ -361,18 +375,18 @@ let controller =
     }
 
     function init() {
-        fetchDataAndDrawChart();
+        fetchCachedDataAndDrawChart();
 
         window.addEventListener('resize', () => {
             drawChart();
         });
 
-        window.setInterval(() => fetchDataAndDrawChart(), 3600 * 1000);
+        window.setInterval(() => fetchCachedDataAndDrawChart(), 3600 * 1000);
     }
 
     function hideLoading() {
         let loading = document.getElementById('loading');
-        loading.parentNode.removeChild(loading);
+        loading && loading.parentNode.removeChild(loading);
     }
 
     init();
@@ -381,6 +395,7 @@ let controller =
         changeView: () => {
             isTaskView = !isTaskView;
             drawChart();
-        }
+        }, 
+        forceFreshData: fetchDataAndDrawChart
     };
 })();

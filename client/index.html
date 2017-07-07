@@ -9,7 +9,8 @@
 <body>
     <div class="main">
         <div class="control">
-            <button class="control-button" onclick="controller.changeView()">Change View</button>
+            <button class="control-button" onclick="controller.changeView()" title="Change Chart view: TASK view or USER view">Change View</button>
+            <button class="control-button" onclick="controller.forceFreshData()" title="Will not use cached data, do not fetch subtasks">Use Fresh Data</button>
         </div>
         <span id="loading">Loading...</span>
         <div id="figure"></div>
