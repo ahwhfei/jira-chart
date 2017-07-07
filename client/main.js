@@ -97,8 +97,9 @@ let controller =
         document.getElementById('figure').innerHTML = '';
 
         const margin = { top: 50, right: 50, bottom: 50, left: 80 };
-        let barHeight = 15;
-        const barPadding = 5;
+        let barHeight = 18;
+        const barPadding = 6;
+        const axisFontHeight = 17;
         let width = document.getElementById('figure').clientWidth - margin.left - margin.right;
         let height = cachedData.length * (barHeight + barPadding);
 
@@ -112,9 +113,9 @@ let controller =
 
         if ((height > (window.innerHeight - 80 - margin.top - margin.bottom)) && height < 1200) {
             let _height = window.innerHeight - 80 - margin.top - margin.bottom - 10;
-            let _barHeight = _height/cachedData.length - barPadding;
+            let _barHeight = _height/(cachedData.length+1) - barPadding;
 
-            if (_barHeight >= 7) {
+            if (_barHeight + barPadding >= axisFontHeight) {
                 height = _height;
                 barHeight = _barHeight;
             }
@@ -150,6 +151,7 @@ let controller =
         let xAxis = d3.svg.axis()
             .scale(xScale)
             .orient('bottom')
+            .ticks(d3.time.weeks, 2)
             .tickSize(-height)
             .outerTickSize(0)
             .tickFormat(d3.time.format('%d %b'));
@@ -194,10 +196,13 @@ let controller =
                 return xScale(new Date());
             })
             .attr('y', (d) => {
-                return yScale(d['Issue key']);
+                return yScale(d['Issue key']) + axisFontHeight/2 - barHeight/2;
             })
             .attr('width', 0)
             .attr('height', barHeight)
+            .on('click', (d) => {
+                // TODO
+            })
             .on('mouseover', tip.show)
             .on('mouseout', tip.hide)
             .transition()
@@ -218,8 +223,9 @@ let controller =
         document.getElementById('figure').innerHTML = '';
 
         const margin = { top: 50, right: 50, bottom: 50, left: 80 };
-        let barHeight = 15;
-        const barPadding = 5;
+        let barHeight = 18;
+        const barPadding = 6;
+        const axisFontHeight = 17;
         let width = document.getElementById('figure').clientWidth - margin.left - margin.right;
         let height = cachedData.length * (barHeight + barPadding);
 
@@ -231,13 +237,15 @@ let controller =
             height = 500;
         }
 
+        let assigneeList = [... new Set(cachedData.map((o) => o['Assignee']))];
+
         if ((height > (window.innerHeight - 80 - margin.top - margin.bottom)) && height < 1200) {
             let _height = window.innerHeight - 80 - margin.top - margin.bottom - 10;
-            let _barHeight = _height/cachedData.length - barPadding;
+            let _barHeight = _height/assigneeList.length - barPadding;
 
-            if (_barHeight >= 7) {
+            if (_barHeight + barPadding >= axisFontHeight) {
                 height = _height;
-                // barHeight = _barHeight;
+                barHeight = _barHeight;
             }
         }
 
@@ -257,7 +265,7 @@ let controller =
             .range([20, width]);
 
         let yScale = d3.scale.ordinal()
-            .domain(cachedData.map((element) => element['Assignee']))
+            .domain(assigneeList)
             .rangeRoundBands([0, height], '.1');
 
         let svg = d3.select('#figure')
@@ -271,6 +279,7 @@ let controller =
         let xAxis = d3.svg.axis()
             .scale(xScale)
             .orient('bottom')
+            .ticks(d3.time.weeks, 2)
             .tickSize(-height)
             .outerTickSize(0)
             .tickFormat(d3.time.format('%d %b'));
@@ -291,13 +300,6 @@ let controller =
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
             .call(yAxis)
 
-        // svg.select('.yaxis')
-        //     .selectAll('text')
-        //     .style("cursor", "pointer")
-        //     .on('click', (d) => {
-        //         window.open('https://issues.citrite.net/browse/' + d, '_blank');
-        //     })
-
         let color = d3.scale.category20();
 
         svg.selectAll('.rect')
@@ -314,10 +316,18 @@ let controller =
                 return xScale(new Date());
             })
             .attr('y', (d) => {
-                return yScale(d['Assignee']) + (barHeight/2);
+                return yScale(d['Assignee'])
             })
             .attr('width', 0)
             .attr('height', barHeight)
+            .style("cursor", "pointer")
+            .on('click', (d) => {
+                if (d3.event.ctrlKey) {
+                    // TODO
+                } else {
+                    window.open('https://issues.citrite.net/browse/' + d['Issue key'], '_blank');
+                }
+            })
             .on('mouseover', tip.show)
             .on('mouseout', tip.hide)
             .transition()

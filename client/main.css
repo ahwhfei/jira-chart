@@ -46,14 +46,14 @@ body {
     fill: none;
     shape-rendering: crispEdges;
     stroke: #ccc;
-    opacity: .3;
+    opacity: .5;
 }
 
 .yaxis path, .yaxis line{
     fill: none;
     shape-rendering: crispEdges;
     stroke: #ccc;
-    opacity: .3;
+    opacity: .5;
 }
 
 .xaxis text, .yaxis text {
