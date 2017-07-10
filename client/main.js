@@ -193,7 +193,6 @@ let controller =
                 if (d['Custom field (Planned Start)']) {
                     return xScale(new Date(d['Custom field (Planned Start)']));
                 }
-                return xScale(new Date());
             })
             .attr('y', (d) => {
                 return yScale(d['Issue key']) + axisFontHeight/2 - barHeight/2;
@@ -208,7 +207,9 @@ let controller =
             .transition()
             .duration(1000)
             .attr('width', (d) => {
-                return xScale(new Date(d['Custom field (Planned End)'])) - xScale(new Date(d['Custom field (Planned Start)']));
+                if (d['Custom field (Planned End)'] && d['Custom field (Planned Start)']) {
+                    return xScale(new Date(d['Custom field (Planned End)'])) - xScale(new Date(d['Custom field (Planned Start)']));
+                }
             })
 
         svg.append('line')
@@ -353,13 +354,17 @@ let controller =
 
     function fetchCachedDataAndDrawChart() {
         d3.json(`${manifest.host}/jiracached`, function (error, data) {
+            console.log(data);
 
             if (error || !data || !data.length) {
                 fetchDataAndDrawChart();
             } else {
                 hideLoading();
-                cachedData = data;
-                console.log(cachedData);
+                cachedData = data.filter((d) => {
+                    return d['Custom field (Planned End)'] 
+                        && d['Custom field (Planned Start)']
+                        && d['Custom field (Planned End)'] !== d['Custom field (Planned Start)'];
+                });
                 drawChart();
             }           
         })
@@ -367,9 +372,13 @@ let controller =
 
     function fetchDataAndDrawChart() {
         d3.csv(`${manifest.host}/jira?url=${manifest.jiraUrl}`, function (error, data) {
+            console.log(data);
             hideLoading();
-            cachedData = data;
-            console.log(cachedData);
+            cachedData = data.filter((d) => {
+                return d['Custom field (Planned End)'] 
+                    && d['Custom field (Planned Start)']
+                    && d['Custom field (Planned End)'] !== d['Custom field (Planned Start)'];
+            });
             drawChart();
         });
     }
