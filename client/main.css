@@ -1,3 +1,14 @@
+@font-face {
+    font-family: "hanglide-icons";
+    src:url("fonts/hanglide-icons.eot");
+    src:url("fonts/hanglide-icons.eot?#iefix") format("embedded-opentype"),
+    url("fonts/hanglide-icons.woff") format("woff"),
+    url("fonts/hanglide-icons.ttf") format("truetype"),
+    url("fonts/hanglide-icons.svg#hanglide-icons") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -93,4 +104,10 @@ body {
   margin: -1px 0 0 0;
   top: 100%;
   left: 0;
+}
+
+.warning {
+    font-family: 'hanglide-icons';
+    font-size: 20px;
+    fill: #ee5555;
 }
