@@ -2,8 +2,8 @@ function drawUserViewChart(cachedData) {
     document.getElementById('figure').innerHTML = '';
 
     const margin = { top: 50, right: 50, bottom: 50, left: 120 };
-    let barHeight = 18;
-    const barPadding = 6;
+    let barHeight = 24;
+    const barPadding = 5;
     const axisFontHeight = 17;
     let width = document.getElementById('figure').clientWidth - margin.left - margin.right;
     let height = ChartHeight().get();
@@ -16,12 +16,14 @@ function drawUserViewChart(cachedData) {
         height = 500;
     }
 
-    let assigneeList = [... new Set(cachedData.map((o) => o['Assignee']))];
+    let assignees = cachedData.map((o) => o['Assignee']);
+    let assigneeList = [... new Set(assignees)].sort();
 
-    barHeight = height/assigneeList.length - barPadding;
+    barHeight = height / assigneeList.length - barPadding;
 
-    const lowDate = new Date(minDate(cachedData));
-    const topDate = new Date(maxDate(cachedData));
+    let dataWithDate = cachedData.filter(d => d['Custom field (Planned End)'] || d['Custom field (Planned Start)']);
+    const lowDate = new Date(minDate(dataWithDate));
+    const topDate = new Date(maxDate(dataWithDate));
 
     if (lowDate == 'Invalid Date' || topDate == 'Invalid Date') {
         console.error('Invalid Data');
@@ -59,7 +61,7 @@ function drawUserViewChart(cachedData) {
         .scale(yScale)
         .tickSize(-width)
         .orient('left')
-
+        .tickFormat(d => users[d] ? users[d] : d)
 
     svg.append('g')
         .attr('class', 'xaxis')
@@ -73,12 +75,16 @@ function drawUserViewChart(cachedData) {
 
     let color = d3.scale.category20();
 
+    // Assignee Part
     svg.selectAll('.rect')
-        .data(cachedData)
+        .data(cachedData.filter(d => d['Custom field (Planned End)'] && d['Custom field (Planned Start)']))
         .enter()
         .append('rect')
         .attr('class', 'rect')
-        .attr('fill', (d, i) => { return color(i); })
+        .attr('fill', (d, i) => {
+            let index = cachedData.findIndex(o => o['Assignee'] === d['Assignee']);
+            return color(index);
+        })
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
         .attr('x', (d) => {
             if (d['Custom field (Planned Start)']) {
@@ -86,10 +92,26 @@ function drawUserViewChart(cachedData) {
             }
         })
         .attr('y', (d) => {
-            return yScale(d['Assignee'])
+            let listByAssignee = cachedData.filter(o => {
+                return o['Assignee'] === d['Assignee']
+                    && o['Custom field (Planned Start)']
+                    && o['Custom field (Planned End)']
+            });
+            let index = listByAssignee.findIndex(o => o['Issue key'] === d['Issue key']);
+            return yScale(d['Assignee']) + barHeight * index / listByAssignee.length;
         })
         .attr('width', 0)
-        .attr('height', barHeight)
+        .attr('height', (d) => {
+            let count = cachedData.filter(o => {
+                return o['Assignee'] === d['Assignee']
+                    && o['Custom field (Planned Start)']
+                    && o['Custom field (Planned End)']
+            }).length;
+            if (count > 1) {
+                return barHeight / count >= 6 ? (barHeight / count - 2) : 4;
+            }
+            return barHeight;
+        })
         .style("cursor", "pointer")
         .on('click', (d) => {
             if (d3.event.ctrlKey) {
@@ -116,11 +138,11 @@ function drawUserViewChart(cachedData) {
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
         .attr('x', xScale(lowDate))
         .attr('y', d => {
-            return yScale(d['Assignee']) + (barHeight+barPadding)/2 + 10;
+            return yScale(d['Assignee']) + (barHeight + barPadding) / 2 + 10;
         })
         .text((d) => {
             if (!d['Custom field (Planned End)'] || !d['Custom field (Planned Start)']) {
-                return  'U';
+                return 'U';
             }
         })
         .style("cursor", "pointer")

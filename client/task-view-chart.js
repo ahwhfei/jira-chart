@@ -9,8 +9,14 @@ function ChartHeight() {
     }
 }
 
-function drawTaskViewChart(cachedData) {
+function drawTaskViewChart(data) {
     document.getElementById('figure').innerHTML = '';
+
+    cachedData = data.filter((d) => {
+        return d['Custom field (Planned End)'] 
+            && d['Custom field (Planned Start)']
+            && d['Custom field (Planned End)'] !== d['Custom field (Planned Start)'];
+        });
 
     const margin = { top: 50, right: 50, bottom: 50, left: 120 };
     let barHeight = 18;
@@ -27,7 +33,7 @@ function drawTaskViewChart(cachedData) {
         height = 500;
     }
 
-    if ((height > (window.innerHeight - 80 - margin.top - margin.bottom)) && height < 1200) {
+    if ((height > (window.innerHeight - 80 - margin.top - margin.bottom)) && height < 1400) {
         let _height = window.innerHeight - 80 - margin.top - margin.bottom - 10;
         let _barHeight = _height / (cachedData.length + 1) - barPadding;
 
@@ -97,15 +103,21 @@ function drawTaskViewChart(cachedData) {
             window.open('https://issues.citrite.net/browse/' + d, '_blank');
         })
 
+    let colorType = {
+        story: '#63BA3C',
+        task: '#4BADE8',
+        bug: '#d62728',
+        'sub-task': '#9467bd'
+    }
 
-    let color = d3.scale.category20();
+    let color = (c) => colorType[c];
 
     svg.selectAll('.rect')
         .data(cachedData)
         .enter()
         .append('rect')
         .attr('class', 'rect')
-        .attr('fill', (d, i) => { return color(i); })
+        .attr('fill', (d, i) => { return color(d['Issue Type'].toLowerCase()); })
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
         .attr('x', (d) => {
             if (d['Custom field (Planned Start)']) {

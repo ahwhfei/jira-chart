@@ -95,10 +95,24 @@
             }
         }
 
+        for (const c of customFields) {
+            if (c['customfieldname'] === 'Developers' && c['customfieldvalues'] && c['customfieldvalues']['customfieldvalue']) {
+                let developers = c['customfieldvalues']['customfieldvalue'];
+                if (Array.isArray(developers)) {
+                    issue['Developers'] = [... developers];
+                } else if (developers !== item.assignee['$']['username']) {
+                    issue['Developers'] = [];
+                    issue['Developers'].push(developers);
+                }
+                break;
+            }
+        }
+
         issue['Issue key'] = item.key['_'];
         issue['Summary'] = item.summary;
-        issue['Assignee'] = item.assignee['_'];
+        issue['Assignee'] = item.assignee['$']['username'];
         issue['Status'] = item.status['_'];
+        issue['Issue Type'] = item.type['_'];
 
         cachedData.push(issue);
     }
@@ -115,7 +129,7 @@
                 cache.put('cacached', _.cloneDeep(cachedData));
                 console.log(`Fetched Data Count: ${cachedData.length} records at ${new Date()}`);
             }
-        }, 20 * 1000);
+        }, 25 * 1000);
     }
 
     function run() {

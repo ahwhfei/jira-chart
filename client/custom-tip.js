@@ -4,7 +4,7 @@ let tip = d3.tip()
     .html((d) => {
         let plannedStart = d['Custom field (Planned Start)'] ? d3.time.format('%d %b')(new Date(d['Custom field (Planned Start)'])) : 'TBD';
         let plannedEnd = d['Custom field (Planned End)'] ? d3.time.format('%d %b')(new Date(d['Custom field (Planned End)'])) : 'TBD';
-        return `<strong>${d['Assignee']}</strong>
+        return `<strong>${users[d['Assignee']] ? users[d['Assignee']] : d['Assignee']}</strong>
                 <span>(${plannedStart} - ${plannedEnd})</span>
                 <span>${d['Status']}</span>
                 <br/>
