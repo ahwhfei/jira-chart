@@ -117,7 +117,7 @@
         cachedData.push(issue);
     }
 
-    function fetchEachIssue() {
+    function run() {
         cachedData = [];
 
         const url = config.jiraUrl;
@@ -129,11 +129,7 @@
                 cache.put('cacached', _.cloneDeep(cachedData));
                 console.log(`Fetched Data Count: ${cachedData.length} records at ${new Date()}`);
             }
-        }, 25 * 1000);
-    }
-
-    function run() {
-        fetchEachIssue();
+        }, 20 * 1000);
     }
 
     (function () {

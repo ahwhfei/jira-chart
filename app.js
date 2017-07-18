@@ -8,7 +8,7 @@
         jira = require('./routes/jira'),
         jiraCached = require('./routes/jira-from-worker');
 
-    let fetchData = require('./worker');
+    let fetchData = require('./worker.promise');
 
     // Enable cross domain GET requests
     app.use(cors({
