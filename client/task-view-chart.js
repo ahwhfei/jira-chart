@@ -17,6 +17,10 @@ function drawTaskViewChart(data) {
             && d['Custom field (Planned Start)']
             && d['Custom field (Planned End)'] !== d['Custom field (Planned Start)']
             && d['Issue Type'] !== 'Sub-task';
+        }).sort((a, b) => {
+            if (a['Priority'] > b['Priority']) return 1;
+            if (a['Priority'] < b['Priority']) return -1;
+            if (a['Priority'] === b['Priority']) return 0;            
         });
 
     const margin = { top: 50, right: 50, bottom: 50, left: 120 };
@@ -99,7 +103,10 @@ function drawTaskViewChart(data) {
 
     svg.select('.yaxis')
         .selectAll('text')
-        .style("cursor", "pointer")
+        .style('cursor', 'pointer')
+        .attr('class', (d, i) => {
+            return `yaxis-text-${cachedData[i]['Priority'].toLowerCase()}`;
+        })
         .on('click', (d) => {
             window.open('https://issues.citrite.net/browse/' + d, '_blank');
         })

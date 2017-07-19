@@ -46,7 +46,7 @@ let controller =
         for (const d of cachedData) {
             cachedFlattenDeveloperData.push(d);
             
-            if (!d['Developers']) {
+            if (!d['Developers'] || d['Subtask']) {
                 continue;
             }
 
@@ -117,12 +117,18 @@ let controller =
         loading && loading.parentNode.removeChild(loading);
     }
 
+    function _configureSite() {
+        console.log('xxxx')
+        document.getElementById('figure').innerHTML = '';
+    }
+
     init();
 
     return {
         showTaskView: _showTaskView, 
         forceFreshData: fetchDataAndDrawChart,
         showAssigneeView: _showAssigneeView,
-        showAssigneeAndDeveloperView: _showUserViewWithDeveloper
+        showAssigneeAndDeveloperView: _showUserViewWithDeveloper,
+        configureSite: _configureSite
     };
 })();

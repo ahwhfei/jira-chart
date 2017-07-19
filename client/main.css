@@ -73,6 +73,28 @@ body {
     fill: #1f77b4;
 }
 
+.yaxis-text-blocker {
+    fill: #d62728 !important;
+    font-weight: bold;
+}
+
+.yaxis-text-critical {
+    fill: red !important;
+    font-weight: bold;    
+}
+
+.yaxis-text-major {
+    fill: #c82728 !important;
+}
+
+.yaxis-text-minor {
+    fill: #4BADE8 !important;
+}
+
+.yaxis-text-tivial {
+    fill: #888888 !important;
+}
+
 .current-line {
     stroke: red;
     stroke-width: 3px;
@@ -110,4 +132,19 @@ body {
     font-family: 'hanglide-icons';
     font-size: 20px;
     fill: #ee5555;
+}
+
+.setting {
+    float: right;
+    margin-top: 5px;
+}
+
+.setting span {
+    font-family: 'hanglide-icons';
+    font-size: 40px;
+    color: grey;
+}
+
+.setting span:hover {
+    cursor: pointer;
 }

@@ -1,12 +1,33 @@
 function drawUserViewChart(cachedData) {
+    function maxCountOfTasksByPerson() {
+        let max = 0;
+
+        for (const d of cachedData) {
+            let count = cachedData.filter(o => {
+                return o['Assignee'] === d['Assignee']
+                    && o['Custom field (Planned Start)']
+                    && o['Custom field (Planned End)']
+            }).length;
+
+            if (count > max) {
+                max = count;
+            }
+        }
+
+        return max;
+    }
+
     document.getElementById('figure').innerHTML = '';
 
     const margin = { top: 50, right: 50, bottom: 50, left: 120 };
     let barHeight = 24;
     const barPadding = 5;
     const axisFontHeight = 17;
+    const minBarHeight = 4;
+    const minBarPadding = 2;
     let width = document.getElementById('figure').clientWidth - margin.left - margin.right;
     let height = ChartHeight().get();
+
 
     if (width <= 0) {
         width = 800;
@@ -18,8 +39,15 @@ function drawUserViewChart(cachedData) {
 
     let assignees = cachedData.map((o) => o['Assignee']);
     let assigneeList = [... new Set(assignees)].sort();
+    
+    const maxCount = maxCountOfTasksByPerson();
 
     barHeight = height / assigneeList.length - barPadding;
+
+    if (barHeight/maxCount < (minBarHeight + minBarPadding)) {
+        barHeight = (minBarHeight + minBarPadding) * maxCount;
+        height = (barHeight + barPadding)*assigneeList.length;
+    }
 
     let dataWithDate = cachedData.filter(d => d['Custom field (Planned End)'] || d['Custom field (Planned Start)']);
     const lowDate = new Date(minDate(dataWithDate));
@@ -108,7 +136,7 @@ function drawUserViewChart(cachedData) {
                     && o['Custom field (Planned End)']
             }).length;
             if (count > 1) {
-                return barHeight / count >= 6 ? (barHeight / count - 2) : 4;
+                return (barHeight / count - minBarPadding);
             }
             return barHeight;
         })

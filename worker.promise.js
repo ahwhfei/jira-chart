@@ -73,6 +73,7 @@
         const subtasks = item.subtasks.subtask;
 
         let promise;
+        let issue = {};
 
         // The issue has sub-task field
         if (subtasks) {
@@ -85,11 +86,11 @@
             } else {
                 tasks.push(subtasks['_']);
             }
+            
+            issue['Subtask'] = tasks;
 
             promise = parseAllIssues(tasks);
         }
-
-        let issue = {};
 
         if (!isAvaiableStatus(item.status['_'])) {
             return promise || Promise.resolve();
@@ -131,6 +132,7 @@
         issue['Assignee'] = item.assignee['$']['username'];
         issue['Status'] = item.status['_'];
         issue['Issue Type'] = item.type['_'];
+        issue['Priority'] = item.priority['_'];
 
         cachedData.push(issue);
 
