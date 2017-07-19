@@ -2,10 +2,9 @@
     'use strict';
     const https = require('https');
     const d3 = require('d3-dsv');
-    const _ = require('lodash');
     const xml2js = require('xml2js');
     const parseString = xml2js.parseString;
-    const cache = require('memory-cache');
+    
     const config = require('./config.json');
 
     let cachedData = [];
@@ -75,8 +74,8 @@
 
         let promise;
 
+        // The issue has sub-task field
         if (subtasks) {
-
             let tasks = [];
 
             if (Array.isArray(subtasks)) {
@@ -97,8 +96,8 @@
         }
 
         let customFields = item.customfields.customfield;
+        // Set 'Planned Start/End' field
         for (const c of customFields) {
-
             if (c['customfieldname'] === 'Planned Start' && c['customfieldvalues'] && c['customfieldvalues']['customfieldvalue']) {
                 issue['Custom field (Planned Start)'] = c['customfieldvalues']['customfieldvalue'];
             }
@@ -112,6 +111,7 @@
             }
         }
 
+        // Set 'Developers' field
         for (const c of customFields) {
             if (c['customfieldname'] === 'Developers' && c['customfieldvalues'] && c['customfieldvalues']['customfieldvalue']) {
                 let developers = c['customfieldvalues']['customfieldvalue'];
@@ -125,6 +125,7 @@
             }
         }
 
+        // Set general fields
         issue['Issue key'] = item.key['_'];
         issue['Summary'] = item.summary;
         issue['Assignee'] = item.assignee['$']['username'];
@@ -145,7 +146,7 @@
             return _getIssueList(data);
         }).then(() => {
             if (cachedData && cachedData.length) {
-                cache.put('cacached', _.cloneDeep(cachedData));
+                process.send(cachedData);
                 console.log(`Fetched Data Count: ${cachedData.length} records at ${new Date()}`);
             }
         });

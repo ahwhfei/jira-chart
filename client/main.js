@@ -56,7 +56,7 @@ let controller =
                     o['OrignalAssignee'] = o['Assignee'];
                     delete o['Assignee'];
                     o['Assignee'] = f;
-                    o['IsDevelop'] = true;
+                    o['IsDeveloper'] = true;
                     cachedFlattenDeveloperData.push(o);
                 }
             }

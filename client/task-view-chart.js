@@ -15,7 +15,8 @@ function drawTaskViewChart(data) {
     cachedData = data.filter((d) => {
         return d['Custom field (Planned End)'] 
             && d['Custom field (Planned Start)']
-            && d['Custom field (Planned End)'] !== d['Custom field (Planned Start)'];
+            && d['Custom field (Planned End)'] !== d['Custom field (Planned Start)']
+            && d['Issue Type'] !== 'Sub-task';
         });
 
     const margin = { top: 50, right: 50, bottom: 50, left: 120 };
