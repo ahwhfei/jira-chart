@@ -8,5 +8,7 @@ let DATAFIELDS = {
     plannedStart: 'Custom field (Planned Start)',
     plannedEnd: 'Custom field (Planned End)',
     priority: 'Priority',
-    subtask: 'Subtask'
+    status: 'Status',
+    subtask: 'Subtask',
+    summary: 'Summary'
 }

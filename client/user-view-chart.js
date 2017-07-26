@@ -98,10 +98,19 @@ function drawUserViewChart(cachedData) {
         .attr('transform', 'translate(' + margin.left + ',' + (height + margin.top) + ')')
         .call(xAxis)
 
+    function customerXAxis(g) {
+        let offset = (barHeight + barPadding) / 2;
+        g.call(yAxis);
+        g.select(".domain").remove();
+        g.selectAll(".tick line")
+            .attr('y1', -offset)
+            .attr('y2', -offset)
+    }
+
     svg.append('g')
         .attr('class', 'yaxis')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-        .call(yAxis)
+        .call(customerXAxis)
 
     let color = d3.scale.category20();
 
@@ -160,13 +169,21 @@ function drawUserViewChart(cachedData) {
             }
         })
 
+    // Show warning if planned start or planned end date not set
+    let dataWithoutPlannedStartOrEnd = cachedData.filter(d => users[d[DATAFIELDS.assignee]] && (!d[DATAFIELDS.plannedEnd] || !d[DATAFIELDS.plannedStart]));
     svg.selectAll('.warning')
-        .data(cachedData.filter(d => users[d[DATAFIELDS.assignee]] && (!d[DATAFIELDS.plannedEnd] || !d[DATAFIELDS.plannedStart])))
+        .data(dataWithoutPlannedStartOrEnd)
         .enter()
         .append('text')
         .attr('class', 'warning')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-        .attr('x', xScale(lowDate))
+        .attr('x', d => {
+            let dataByAssignee = dataWithoutPlannedStartOrEnd.filter(o => o[DATAFIELDS.assignee] === d[DATAFIELDS.assignee]);
+
+            let index = dataByAssignee.findIndex(o => o[DATAFIELDS.issueKey] === d[DATAFIELDS.issueKey]);
+
+            return xScale(lowDate) + index*20;
+        })
         .attr('y', d => {
             return yScale(d[DATAFIELDS.assignee]) + (barHeight + barPadding) / 2 + 10;
         })
@@ -186,6 +203,7 @@ function drawUserViewChart(cachedData) {
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide)
 
+    // Current date baseline
     svg.append('line')
         .attr('class', 'current-line')
         .attr('y2', height)

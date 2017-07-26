@@ -75,7 +75,7 @@ let controller =
 
     function fetchCachedDataAndDrawChart() {
         d3.json(`${manifest.host}/jiracached`, function (error, data) {
-            console.log(data);
+            console.table(data);
 
             if (error || !data || !data.length) {
                 fetchDataAndDrawChart();

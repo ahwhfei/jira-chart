@@ -97,10 +97,15 @@ function drawTaskViewChart(data) {
         .attr('transform', 'translate(' + margin.left + ',' + (height + margin.top) + ')')
         .call(xAxis)
 
+    function customerYAxis(g) {
+        g.call(yAxis);
+        g.select(".domain").remove();
+    }
+
     svg.append('g')
         .attr('class', 'yaxis')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-        .call(yAxis)
+        .call(customerYAxis)
 
     svg.select('.yaxis')
         .selectAll('text')

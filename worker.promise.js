@@ -153,14 +153,14 @@
                 process.send(cachedData);
                 console.log(`Fetched Data Count: ${cachedData.length} records at ${new Date()}`);
             }
+
+            setTimeout(() => run(), config.fetchDataInterval * 1000);
+        }).catch((err) =>{
+            console.error(`Exception: ${err.message} at ${new Date()}`);
+            
+            setTimeout(() => run(), config.fetchDataInterval * 1000);
         });
     }
 
-    (function () {
-        run();
-
-        setInterval(() => {
-            run();
-        }, config.fetchDataInterval * 1000);
-    })();
+    run();
 })();
