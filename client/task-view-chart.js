@@ -13,7 +13,8 @@ function drawTaskViewChart(data) {
     document.getElementById('figure').innerHTML = '';
 
     cachedData = data.filter((d) => {
-        return d['Custom field (Planned End)'] 
+        return users[d['Assignee']]
+            && d['Custom field (Planned End)']
             && d['Custom field (Planned Start)']
             && d['Custom field (Planned End)'] !== d['Custom field (Planned Start)']
             && d['Issue Type'] !== 'Sub-task';

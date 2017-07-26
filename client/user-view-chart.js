@@ -37,8 +37,10 @@ function drawUserViewChart(cachedData) {
         height = 500;
     }
 
-    let assignees = cachedData.map((o) => o['Assignee']);
-    let assigneeList = [... new Set(assignees)].sort();
+    let assigneeList = [];
+    for (const e in users) {
+        assigneeList.push(e);
+    }
     
     const maxCount = maxCountOfTasksByPerson();
 
@@ -105,7 +107,7 @@ function drawUserViewChart(cachedData) {
 
     // Assignee Part
     svg.selectAll('.rect')
-        .data(cachedData.filter(d => d['Custom field (Planned End)'] && d['Custom field (Planned Start)']))
+        .data(cachedData.filter(d => d['Custom field (Planned End)'] && d['Custom field (Planned Start)'] && users[d['Assignee']]))
         .enter()
         .append('rect')
         .attr('class', 'rect')
@@ -159,7 +161,7 @@ function drawUserViewChart(cachedData) {
         })
 
     svg.selectAll('.warning')
-        .data(cachedData.filter(d => !d['Custom field (Planned End)'] || !d['Custom field (Planned Start)']))
+        .data(cachedData.filter(d => users[d['Assignee']] && (!d['Custom field (Planned End)'] || !d['Custom field (Planned Start)'])))
         .enter()
         .append('text')
         .attr('class', 'warning')
