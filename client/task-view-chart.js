@@ -13,15 +13,15 @@ function drawTaskViewChart(data) {
     document.getElementById('figure').innerHTML = '';
 
     cachedData = data.filter((d) => {
-        return users[d['Assignee']]
-            && d['Custom field (Planned End)']
-            && d['Custom field (Planned Start)']
-            && d['Custom field (Planned End)'] !== d['Custom field (Planned Start)']
-            && d['Issue Type'] !== 'Sub-task';
+        return users[d[DATAFIELDS.assignee]]
+            && d[DATAFIELDS.plannedEnd]
+            && d[DATAFIELDS.plannedStart]
+            && d[DATAFIELDS.plannedEnd] !== d[DATAFIELDS.plannedStart]
+            && d[DATAFIELDS.issueType] !== 'Sub-task';
         }).sort((a, b) => {
-            if (a['Priority'] > b['Priority']) return 1;
-            if (a['Priority'] < b['Priority']) return -1;
-            if (a['Priority'] === b['Priority']) return 0;            
+            if (a[DATAFIELDS.priority] > b[DATAFIELDS.priority]) return 1;
+            if (a[DATAFIELDS.priority] < b[DATAFIELDS.priority]) return -1;
+            if (a[DATAFIELDS.priority] === b[DATAFIELDS.priority]) return 0;            
         });
 
     const margin = { top: 50, right: 50, bottom: 50, left: 120 };
@@ -67,7 +67,7 @@ function drawTaskViewChart(data) {
         .range([20, width]);
 
     let yScale = d3.scale.ordinal()
-        .domain(cachedData.map((element) => element['Issue key']))
+        .domain(cachedData.map((element) => element[DATAFIELDS.issueKey]))
         .rangeRoundBands([0, height], '.1');
 
     let svg = d3.select('#figure')
@@ -106,10 +106,10 @@ function drawTaskViewChart(data) {
         .selectAll('text')
         .style('cursor', 'pointer')
         .attr('class', (d, i) => {
-            return `yaxis-text-${cachedData[i]['Priority'].toLowerCase()}`;
+            return `yaxis-text-${cachedData[i][DATAFIELDS.priority].toLowerCase()}`;
         })
         .on('click', (d) => {
-            window.open('https://issues.citrite.net/browse/' + d, '_blank');
+            window.open(`${manifest.jiraIssueUrl}${d}`, '_blank');
         })
 
     let colorType = {
@@ -126,15 +126,15 @@ function drawTaskViewChart(data) {
         .enter()
         .append('rect')
         .attr('class', 'rect')
-        .attr('fill', (d, i) => { return color(d['Issue Type'].toLowerCase()); })
+        .attr('fill', (d, i) => { return color(d[DATAFIELDS.issueType].toLowerCase()); })
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
         .attr('x', (d) => {
-            if (d['Custom field (Planned Start)']) {
-                return xScale(new Date(d['Custom field (Planned Start)']));
+            if (d[DATAFIELDS.plannedStart]) {
+                return xScale(new Date(d[DATAFIELDS.plannedStart]));
             }
         })
         .attr('y', (d) => {
-            return yScale(d['Issue key']) + axisFontHeight / 2 - barHeight / 2;
+            return yScale(d[DATAFIELDS.issueKey]) + axisFontHeight / 2 - barHeight / 2;
         })
         .attr('width', 0)
         .attr('height', barHeight)
@@ -146,8 +146,8 @@ function drawTaskViewChart(data) {
         .transition()
         .duration(1000)
         .attr('width', (d) => {
-            if (d['Custom field (Planned End)'] && d['Custom field (Planned Start)']) {
-                return xScale(new Date(d['Custom field (Planned End)'])) - xScale(new Date(d['Custom field (Planned Start)']));
+            if (d[DATAFIELDS.plannedEnd] && d[DATAFIELDS.plannedStart]) {
+                return xScale(new Date(d[DATAFIELDS.plannedEnd])) - xScale(new Date(d[DATAFIELDS.plannedStart]));
             }
         })
 

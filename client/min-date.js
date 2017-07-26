@@ -8,8 +8,8 @@ function minDate(cachedData) {
             minOfPlannedStart = i;
         }
 
-        if (o['Custom field (Planned Start)']
-            && new Date(o['Custom field (Planned Start)']) < new Date(cachedData[minOfPlannedStart]['Custom field (Planned Start)'])) {
+        if (o[DATAFIELDS.plannedStart]
+            && new Date(o[DATAFIELDS.plannedStart]) < new Date(cachedData[minOfPlannedStart][DATAFIELDS.plannedStart])) {
             minOfPlannedStart = i;
         }
     });
@@ -20,19 +20,19 @@ function minDate(cachedData) {
             minOfPlannedEnd = i;
         }
 
-        if (o['Custom field (Planned End)']
-            && new Date(o['Custom field (Planned End)']) < new Date(cachedData[minOfPlannedEnd]['Custom field (Planned End)'])) {
+        if (o[DATAFIELDS.plannedEnd]
+            && new Date(o[DATAFIELDS.plannedEnd]) < new Date(cachedData[minOfPlannedEnd][DATAFIELDS.plannedEnd])) {
             minOfPlannedEnd = i;
         }
     });
 
     if (minOfPlannedStart === undefined) {
-        return cachedData[minOfPlannedEnd] && cachedData[minOfPlannedEnd]['Custom field (Planned End)'];
+        return cachedData[minOfPlannedEnd] && cachedData[minOfPlannedEnd][DATAFIELDS.plannedEnd];
     } else if (minOfPlannedEnd === undefined) {
-        return cachedData[minOfPlannedStart] && cachedData[minOfPlannedStart]['Custom field (Planned Start)'];
-    } else if (new Date(cachedData[minOfPlannedStart]['Custom field (Planned Start)']) < new Date(cachedData[minOfPlannedEnd]['Custom field (Planned End)'])) {
-        return cachedData[minOfPlannedStart]['Custom field (Planned Start)'];
+        return cachedData[minOfPlannedStart] && cachedData[minOfPlannedStart][DATAFIELDS.plannedStart];
+    } else if (new Date(cachedData[minOfPlannedStart][DATAFIELDS.plannedStart]) < new Date(cachedData[minOfPlannedEnd][DATAFIELDS.plannedEnd])) {
+        return cachedData[minOfPlannedStart][DATAFIELDS.plannedStart];
     } else {
-        return cachedData[minOfPlannedEnd]['Custom field (Planned End)'];
+        return cachedData[minOfPlannedEnd][DATAFIELDS.plannedEnd];
     }
 }

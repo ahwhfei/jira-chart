@@ -4,9 +4,9 @@ function drawUserViewChart(cachedData) {
 
         for (const d of cachedData) {
             let count = cachedData.filter(o => {
-                return o['Assignee'] === d['Assignee']
-                    && o['Custom field (Planned Start)']
-                    && o['Custom field (Planned End)']
+                return o[DATAFIELDS.assignee] === d[DATAFIELDS.assignee]
+                    && o[DATAFIELDS.plannedStart]
+                    && o[DATAFIELDS.plannedEnd]
             }).length;
 
             if (count > max) {
@@ -51,7 +51,7 @@ function drawUserViewChart(cachedData) {
         height = (barHeight + barPadding)*assigneeList.length;
     }
 
-    let dataWithDate = cachedData.filter(d => d['Custom field (Planned End)'] || d['Custom field (Planned Start)']);
+    let dataWithDate = cachedData.filter(d => d[DATAFIELDS.plannedEnd] || d[DATAFIELDS.plannedStart]);
     const lowDate = new Date(minDate(dataWithDate));
     const topDate = new Date(maxDate(dataWithDate));
 
@@ -107,47 +107,47 @@ function drawUserViewChart(cachedData) {
 
     // Assignee Part
     svg.selectAll('.rect')
-        .data(cachedData.filter(d => d['Custom field (Planned End)'] && d['Custom field (Planned Start)'] && users[d['Assignee']]))
+        .data(cachedData.filter(d => d[DATAFIELDS.plannedEnd] && d[DATAFIELDS.plannedStart] && users[d[DATAFIELDS.assignee]]))
         .enter()
         .append('rect')
         .attr('class', 'rect')
         .attr('fill', (d, i) => {
-            let index = cachedData.findIndex(o => o['Assignee'] === d['Assignee']);
+            let index = cachedData.findIndex(o => o[DATAFIELDS.assignee] === d[DATAFIELDS.assignee]);
             return color(index);
         })
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
         .attr('x', (d) => {
-            if (d['Custom field (Planned Start)']) {
-                return xScale(new Date(d['Custom field (Planned Start)']));
+            if (d[DATAFIELDS.plannedStart]) {
+                return xScale(new Date(d[DATAFIELDS.plannedStart]));
             }
         })
         .attr('y', (d) => {
             let listByAssignee = cachedData.filter(o => {
-                return o['Assignee'] === d['Assignee']
-                    && o['Custom field (Planned Start)']
-                    && o['Custom field (Planned End)']
+                return o[DATAFIELDS.assignee] === d[DATAFIELDS.assignee]
+                    && o[DATAFIELDS.plannedStart]
+                    && o[DATAFIELDS.plannedEnd]
             });
-            let index = listByAssignee.findIndex(o => o['Issue key'] === d['Issue key']);
-            return yScale(d['Assignee']) + barHeight * index / listByAssignee.length;
+            let index = listByAssignee.findIndex(o => o[DATAFIELDS.issueKey] === d[DATAFIELDS.issueKey]);
+            return yScale(d[DATAFIELDS.assignee]) + barHeight * index / listByAssignee.length;
         })
         .attr('width', 0)
         .attr('height', (d) => {
             let count = cachedData.filter(o => {
-                return o['Assignee'] === d['Assignee']
-                    && o['Custom field (Planned Start)']
-                    && o['Custom field (Planned End)']
+                return o[DATAFIELDS.assignee] === d[DATAFIELDS.assignee]
+                    && o[DATAFIELDS.plannedStart]
+                    && o[DATAFIELDS.plannedEnd]
             }).length;
             if (count > 1) {
                 return (barHeight / count - minBarPadding);
             }
             return barHeight;
         })
-        .style("cursor", "pointer")
+        .style('cursor', 'pointer')
         .on('click', (d) => {
             if (d3.event.ctrlKey) {
                 // TODO
             } else {
-                window.open('https://issues.citrite.net/browse/' + d['Issue key'], '_blank');
+                window.open(`${manifest.jiraIssueUrl}${d[DATAFIELDS.issueKey]}`, '_blank');
             }
         })
         .on('mouseover', tip.show)
@@ -155,32 +155,32 @@ function drawUserViewChart(cachedData) {
         .transition()
         .duration(1000)
         .attr('width', (d) => {
-            if (d['Custom field (Planned Start)']) {
-                return xScale(new Date(d['Custom field (Planned End)'])) - xScale(new Date(d['Custom field (Planned Start)']));
+            if (d[DATAFIELDS.plannedStart]) {
+                return xScale(new Date(d[DATAFIELDS.plannedEnd])) - xScale(new Date(d[DATAFIELDS.plannedStart]));
             }
         })
 
     svg.selectAll('.warning')
-        .data(cachedData.filter(d => users[d['Assignee']] && (!d['Custom field (Planned End)'] || !d['Custom field (Planned Start)'])))
+        .data(cachedData.filter(d => users[d[DATAFIELDS.assignee]] && (!d[DATAFIELDS.plannedEnd] || !d[DATAFIELDS.plannedStart])))
         .enter()
         .append('text')
         .attr('class', 'warning')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
         .attr('x', xScale(lowDate))
         .attr('y', d => {
-            return yScale(d['Assignee']) + (barHeight + barPadding) / 2 + 10;
+            return yScale(d[DATAFIELDS.assignee]) + (barHeight + barPadding) / 2 + 10;
         })
         .text((d) => {
-            if (!d['Custom field (Planned End)'] || !d['Custom field (Planned Start)']) {
+            if (!d[DATAFIELDS.plannedEnd] || !d[DATAFIELDS.plannedStart]) {
                 return 'U';
             }
         })
-        .style("cursor", "pointer")
+        .style('cursor', 'pointer')
         .on('click', (d) => {
             if (d3.event.ctrlKey) {
                 // TODO
             } else {
-                window.open('https://issues.citrite.net/browse/' + d['Issue key'], '_blank');
+                window.open(`${manifest.jiraIssueUrl}${d[DATAFIELDS.issueKey]}`, '_blank');
             }
         })
         .on('mouseover', tip.show)

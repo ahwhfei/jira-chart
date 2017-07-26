@@ -8,8 +8,8 @@ function maxDate(cachedData) {
             maxOfPlannedStart = i;
         }
 
-        if (o['Custom field (Planned Start)']
-            && new Date(o['Custom field (Planned Start)']) > new Date(cachedData[maxOfPlannedStart]['Custom field (Planned Start)'])) {
+        if (o[DATAFIELDS.plannedStart]
+            && new Date(o[DATAFIELDS.plannedStart]) > new Date(cachedData[maxOfPlannedStart][DATAFIELDS.plannedStart])) {
             maxOfPlannedStart = i;
         }
     });
@@ -20,19 +20,19 @@ function maxDate(cachedData) {
             maxOfPlannedEnd = i;
         }
 
-        if (o['Custom field (Planned End)']
-            && new Date(o['Custom field (Planned End)']) > new Date(cachedData[maxOfPlannedEnd]['Custom field (Planned End)'])) {
+        if (o[DATAFIELDS.plannedEnd]
+            && new Date(o[DATAFIELDS.plannedEnd]) > new Date(cachedData[maxOfPlannedEnd][DATAFIELDS.plannedEnd])) {
             maxOfPlannedEnd = i;
         }
     });
 
     if (maxOfPlannedStart === undefined) {
-        return cachedData[maxOfPlannedEnd] && cachedData[maxOfPlannedEnd]['Custom field (Planned End)'];
+        return cachedData[maxOfPlannedEnd] && cachedData[maxOfPlannedEnd][DATAFIELDS.plannedEnd];
     } else if (maxOfPlannedEnd === undefined) {
-        return cachedData[maxOfPlannedStart] && cachedData[maxOfPlannedStart]['Custom field (Planned Start)'];
-    } else if (new Date(cachedData[maxOfPlannedStart]['Custom field (Planned Start)']) > new Date(cachedData[maxOfPlannedEnd]['Custom field (Planned End)'])) {
-        return cachedData[maxOfPlannedStart]['Custom field (Planned Start)'];
+        return cachedData[maxOfPlannedStart] && cachedData[maxOfPlannedStart][DATAFIELDS.plannedStart];
+    } else if (new Date(cachedData[maxOfPlannedStart][DATAFIELDS.plannedStart]) > new Date(cachedData[maxOfPlannedEnd][DATAFIELDS.plannedEnd])) {
+        return cachedData[maxOfPlannedStart][DATAFIELDS.plannedStart];
     } else {
-        return cachedData[maxOfPlannedEnd]['Custom field (Planned End)'];
+        return cachedData[maxOfPlannedEnd][DATAFIELDS.plannedEnd];
     }
 }

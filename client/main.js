@@ -46,17 +46,17 @@ let controller =
         for (const d of cachedData) {
             cachedFlattenDeveloperData.push(d);
             
-            if (!d['Developers'] || d['Subtask']) {
+            if (!d[DATAFIELDS.developers] || d[DATAFIELDS.subtask]) {
                 continue;
             }
 
-            for (const f of d['Developers']) {
-                if (f !== d['Assignee']) {
+            for (const f of d[DATAFIELDS.developers]) {
+                if (f !== d[DATAFIELDS.assignee]) {
                     let o = _.cloneDeep(d);
-                    o['OrignalAssignee'] = o['Assignee'];
-                    delete o['Assignee'];
-                    o['Assignee'] = f;
-                    o['IsDeveloper'] = true;
+                    o[DATAFIELDS.originalAssignee] = o[DATAFIELDS.assignee];
+                    delete o[DATAFIELDS.assignee];
+                    o[DATAFIELDS.assignee] = f;
+                    o[DATAFIELDS.isDeveloper] = true;
                     cachedFlattenDeveloperData.push(o);
                 }
             }
