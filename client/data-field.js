@@ -1,6 +1,6 @@
 let DATAFIELDS = {
     assignee: 'Assignee',
-    develops: 'Developers',
+    developers: 'Developers',
     isDeveloper: 'IsDeveloper',
     issueKey: 'Issue key',
     issueType: 'Issue Type',
