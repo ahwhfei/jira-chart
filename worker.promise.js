@@ -9,6 +9,8 @@
 
     let cachedData = [];
 
+    console.log(`Worker PID #${process.pid} at ${new Date()}`);
+
     function fetchJiraData(url) {
         return new Promise((resolve, reject) => {
             https.get(url, (res) => {

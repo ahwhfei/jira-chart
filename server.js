@@ -19,6 +19,8 @@
         cache.put('cacached', data);
     });
 
+    console.log(`PID #${process.pid} at ${new Date()}`);
+
     /**
      * Get port from environment and store in Express.
      */
