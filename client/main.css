@@ -53,6 +53,10 @@ body {
     box-shadow: 4px 7px 23px -8px rgba(0,0,0,0.61);
 }
 
+.axis-rect:hover {
+    fill: #D8D8D8;
+}
+
 .xaxis path, .xaxis line{
     fill: none;
     shape-rendering: crispEdges;

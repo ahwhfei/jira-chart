@@ -31,8 +31,8 @@ function drawTaskViewChart(data) {
     let width = document.getElementById('figure').clientWidth - margin.left - margin.right;
     let height = cachedData.length * (barHeight + barPadding);
 
-    if (width <= 0) {
-        width = 800;
+    if (width < 200) {
+        width = 200;
     }
 
     if (height <= 0) {
