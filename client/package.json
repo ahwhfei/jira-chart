@@ -4,7 +4,8 @@
   "description": "Project Dashboar UI",
   "main": "main.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm install && typings install",
+    "start": "webpack-dev-server --inline --progress --port 8088"
   },
   "author": "Hongfei Wu",
   "license": "ISC",
@@ -15,15 +16,19 @@
     "@angular/core": "^4.3.1",
     "@angular/platform-browser": "^4.3.1",
     "@angular/platform-browser-dynamic": "^4.3.1",
+    "core-js": "^2.4.1",
     "rxjs": "^5.4.2",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
+    "html-webpack-plugin": "^2.29.0",
+    "raw-loader": "^0.5.1",
     "ts-loader": "^2.3.2",
     "tslint": "^5.5.0",
     "tslint-loader": "^3.5.3",
     "typescript": "^2.4.2",
     "typings": "^2.1.1",
-    "webpack": "^3.4.1"
+    "webpack": "^3.4.1",
+    "webpack-dev-server": "^2.6.1"
   }
 }
