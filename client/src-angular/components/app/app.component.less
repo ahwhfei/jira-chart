@@ -1,0 +1,115 @@
+.app-container {
+    margin: 0 5%;
+}
+
+#figure {
+    margin: auto;
+}
+
+.svg {
+    border: 1px solid #ccc;
+    background-color: #dfdfdf;
+    -webkit-box-shadow: 4px 7px 23px -8px rgba(0,0,0,0.61);
+    -moz-box-shadow: 4px 7px 23px -8px rgba(0,0,0,0.61);
+    box-shadow: 4px 7px 23px -8px rgba(0,0,0,0.61);
+}
+
+.axis-rect:hover {
+    fill: #D8D8D8;
+}
+
+.xaxis path, .xaxis line{
+    fill: none;
+    shape-rendering: crispEdges;
+    stroke: #ccc;
+    opacity: .5;
+}
+
+.yaxis path, .yaxis line{
+    fill: none;
+    shape-rendering: crispEdges;
+    stroke: #ccc;
+    opacity: .5;
+}
+
+.xaxis text, .yaxis text {
+    font-size: 14px;
+    font-family: 'Roboto', 'citrixsans-regular', 'Times New Roman', Georgia, Serif;;
+    fill: #1f77b4;
+}
+
+.yaxis-text-blocker {
+    fill: #d62728 !important;
+    font-weight: bold;
+}
+
+.yaxis-text-critical {
+    fill: red !important;
+    font-weight: bold;    
+}
+
+.yaxis-text-major {
+    fill: #c82728 !important;
+}
+
+.yaxis-text-minor {
+    fill: #4BADE8 !important;
+}
+
+.yaxis-text-tivial {
+    fill: #888888 !important;
+}
+
+.current-line {
+    stroke: red;
+    stroke-width: 3px;
+}
+
+.d3-tip {
+  font-size: 12px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  border-radius: 3px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+.warning {
+    font-family: 'hanglide-icons';
+    font-size: 20px;
+    fill: #ee5555;
+}
+
+.setting {
+    float: right;
+    margin-top: 5px;
+}
+
+.setting span {
+    font-family: 'hanglide-icons';
+    font-size: 40px;
+    color: grey;
+}
+
+.setting span:hover {
+    cursor: pointer;
+}

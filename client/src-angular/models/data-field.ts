@@ -1,4 +1,4 @@
-const DATAFIELDS = {
+export const DATAFIELDS = {
     assignee: 'Assignee',
     developers: 'Developers',
     isDeveloper: 'IsDeveloper',
@@ -11,4 +11,4 @@ const DATAFIELDS = {
     status: 'Status',
     subtask: 'Subtask',
     summary: 'Summary'
-}
+};
