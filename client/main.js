@@ -120,7 +120,7 @@ let controller =
 
     function _configureSite() {
         console.log('xxxx')
-        document.getElementById('figure').innerHTML = '';
+        // document.getElementById('container').innerHTML = '';
     }
 
     init();

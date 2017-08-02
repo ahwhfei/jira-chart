@@ -267,7 +267,7 @@ function drawUserViewChart(cachedData) {
             .attr('width', width + margin.left + margin.right)
             .append('g')
             .attr('class', 'xaxis')
-            .attr('transform', 'translate(' + margin.left + ',' + 0 + ')')
+            .attr('transform', 'translate(' + margin.left + ',' + 10 + ')')
             .call(xAxis);
     }
 
