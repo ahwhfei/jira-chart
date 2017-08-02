@@ -1,7 +1,7 @@
 function drawUserViewChart(cachedData) {
     'use strict';
  
-    const margin = { top: 50, right: 50, bottom: 50, left: 150 };
+    const margin = { top: 0, right: 50, bottom: -2, left: 150 };
     const barPadding = 5;
     const axisFontHeight = 17;
     const minBarHeight = 4;
@@ -258,11 +258,25 @@ function drawUserViewChart(cachedData) {
             .attr('transform', 'translate(' + (margin.left + xScale(new Date())) + ',' + margin.top + ')');
     }
 
+    function _drawFixedXaxis() {
+        document.getElementById('xaxis-chart').innerHTML = '';
+
+        d3.select('#xaxis-chart')
+            .append('svg')
+            .attr('height', 40)
+            .attr('width', width + margin.left + margin.right)
+            .append('g')
+            .attr('class', 'xaxis')
+            .attr('transform', 'translate(' + margin.left + ',' + 0 + ')')
+            .call(xAxis);
+    }
+
     function _init() {
         let svg = _createSvg();
         _initTooltip(svg);
         _drawAxisZebra(svg);
         _drawXYAxis(svg);
+        _drawFixedXaxis();
         _drawUserDataBar(svg);
         _drawWarning(svg);
         _drawTodayBaseline(svg);    

@@ -24,7 +24,7 @@ function drawTaskViewChart(data) {
             if (a[DATAFIELDS.priority] === b[DATAFIELDS.priority]) return 0;            
         });
 
-    const margin = { top: 50, right: 50, bottom: 50, left: 120 };
+    const margin = { top: 0, right: 50, bottom: -2, left: 120 };
     let barHeight = 18;
     const barPadding = 6;
     const axisFontHeight = 17;
@@ -96,6 +96,21 @@ function drawTaskViewChart(data) {
         .attr('class', 'xaxis')
         .attr('transform', 'translate(' + margin.left + ',' + (height + margin.top) + ')')
         .call(xAxis)
+
+    function _drawFixedXaxis() {
+        document.getElementById('xaxis-chart').innerHTML = '';
+        
+        d3.select('#xaxis-chart')
+            .append('svg')
+            .attr('height', 40)
+            .attr('width', width + margin.left + margin.right)
+            .append('g')
+            .attr('class', 'xaxis')
+            .attr('transform', 'translate(' + margin.left + ',' + 10 + ')')
+            .call(xAxis);
+    }
+
+    _drawFixedXaxis();
 
     function customerYAxis(g) {
         g.call(yAxis);

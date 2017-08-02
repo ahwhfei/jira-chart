@@ -115,6 +115,7 @@ let controller =
     function hideLoading() {
         let loading = document.getElementById('loading');
         loading && loading.parentNode.removeChild(loading);
+        document.getElementById('container').style.display = 'block';
     }
 
     function _configureSite() {
