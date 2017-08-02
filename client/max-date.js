@@ -4,7 +4,7 @@ function maxDate(cachedData) {
 
     //Planned Start
     cachedData.forEach((o, i) => {
-        if (maxOfPlannedStart === undefined) {
+        if (maxOfPlannedStart === undefined || !cachedData[maxOfPlannedStart][DATAFIELDS.plannedStart]) {
             maxOfPlannedStart = i;
         }
 
@@ -16,7 +16,7 @@ function maxDate(cachedData) {
 
     //Planned End
     cachedData.forEach((o, i) => {
-        if (maxOfPlannedEnd === undefined) {
+        if (maxOfPlannedEnd === undefined || !cachedData[maxOfPlannedEnd][DATAFIELDS.plannedEnd]) {
             maxOfPlannedEnd = i;
         }
 

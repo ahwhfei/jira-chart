@@ -4,7 +4,7 @@ function minDate(cachedData) {
 
     //Planned Start
     cachedData.forEach((o, i) => {
-        if (minOfPlannedStart === undefined) {
+        if (minOfPlannedStart === undefined || !cachedData[minOfPlannedStart][DATAFIELDS.plannedStart]) {
             minOfPlannedStart = i;
         }
 
@@ -16,7 +16,7 @@ function minDate(cachedData) {
 
     //Planned End
     cachedData.forEach((o, i) => {
-        if (minOfPlannedEnd === undefined) {
+        if (minOfPlannedEnd === undefined || !cachedData[minOfPlannedEnd][DATAFIELDS.plannedEnd]) {
             minOfPlannedEnd = i;
         }
 
