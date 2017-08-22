@@ -13,11 +13,19 @@
     const childProcess = require('child_process');
     const cache = require('memory-cache');
 
+    function forkWorkerProcess() {
+        const worker = childProcess.fork('./worker.promise');
+        worker.on('message', (data) => {
+            cache.put('cacached', data);
+        });
+        worker.on('exit', (code) => {
+            console.log(`Worker PID #${worker.pid} Exit with Code: ${code}`);
+            forkWorkerProcess();
+        });
+    }
+
     // Fork a work process to fetch data
-    const worker = childProcess.fork('./worker.promise');
-    worker.on('message', (data) => {
-        cache.put('cacached', data);
-    });
+    forkWorkerProcess();
 
     console.log(`PID #${process.pid} at ${new Date()}`);
 
