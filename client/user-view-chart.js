@@ -7,7 +7,7 @@ function drawUserViewChart(cachedData) {
     const minBarHeight = 4;
     const minBarPadding = 2;
 
-    let assigneeList = [];
+    let assigneeList = _getSortedAssigneeList();
     const [width, height, barHeight] = _determineWidthHeight();
     const [lowDate, topDate] = _determineXAxisLimit();
     const [xScale, yScale] = _createXYScale();
@@ -51,6 +51,46 @@ function drawUserViewChart(cachedData) {
             .attr('width', width + margin.left + margin.right);
     }
 
+    function _getAssigneeList() {
+        let assignees = [];
+        for (const e in users) {
+            if (users.hasOwnProperty(e)) {
+                assignees.push(e);
+            }
+        }
+
+        return assignees;
+    }
+
+    function _getSortedAssigneeList() {
+        let assignees = _getAssigneeList();
+        let dataWithPlannedEndDate = cachedData.filter(d => users[d[DATAFIELDS.assignee]] && d[DATAFIELDS.plannedEnd]);
+
+        for (const d of dataWithPlannedEndDate) {
+            if (!users[d[DATAFIELDS.assignee]].maxPlannedEnd 
+                || users[d[DATAFIELDS.assignee]].maxPlannedEnd < new Date(d[DATAFIELDS.plannedEnd])) {
+                users[d[DATAFIELDS.assignee]].maxPlannedEnd = new Date(d[DATAFIELDS.plannedEnd]);
+            }
+        }
+
+        function compare(a, b) {
+            if (!users[a].maxPlannedEnd && !users[b].maxPlannedEnd) return 0;
+            if (!users[a].maxPlannedEnd && users[b].maxPlannedEnd) return -1;
+            if (users[a].maxPlannedEnd && !users[b].maxPlannedEnd) return 1;
+            if (users[a].maxPlannedEnd > users[b].maxPlannedEnd) return 1;
+            if (users[a].maxPlannedEnd === users[b].maxPlannedEnd) return 0;
+            if (users[a].maxPlannedEnd < users[b].maxPlannedEnd) return -1;
+        }
+
+        return [
+            ...assignees.filter(e => users[e].role === 'frontend').sort(compare),
+            ...assignees.filter(e => users[e].role === 'backend').sort(compare),
+            ...assignees.filter(e => users[e].role === 'test').sort(compare),
+            ...assignees.filter(e => users[e].role === 'devops').sort(compare),
+            ...assignees.filter(e => users[e].role === '3p').sort(compare),
+        ];
+    }
+
     function _determineWidthHeight() {
         let width = document.getElementById('figure').clientWidth - margin.left - margin.right;
         let height = ChartHeight().get();
@@ -62,10 +102,6 @@ function drawUserViewChart(cachedData) {
 
         if (height <= 0) {
             height = 500;
-        }
-
-        for (const e in users) {
-            assigneeList.push(e);
         }
 
         barHeight = height / assigneeList.length - barPadding;
@@ -114,7 +150,7 @@ function drawUserViewChart(cachedData) {
         let yAxis = d3.svg.axis()
             .scale(yScale)
             .orient('left')
-            .tickFormat(d => users[d] ? users[d] : d);
+            .tickFormat(d => users[d] && users[d].name ? users[d].name : d);
 
         return [xAxis, yAxis];
     }
@@ -142,9 +178,17 @@ function drawUserViewChart(cachedData) {
             .call(xAxis);
 
         svg.append('g')
-        .attr('class', 'yaxis')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-        .call(customerYAxis);
+            .attr('class', 'yaxis')
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+            .call(customerYAxis);
+    }
+
+    function _setYAxisTextColor(svg) {
+        svg.select('.yaxis')
+            .selectAll('text')
+            .attr('class', (d, i) => {
+                return `yaxis-text-${users[assigneeList[i]].role.toLowerCase()}`;
+            });
     }
 
     function customerYAxis(g) {
@@ -276,6 +320,7 @@ function drawUserViewChart(cachedData) {
         _initTooltip(svg);
         _drawAxisZebra(svg);
         _drawXYAxis(svg);
+        _setYAxisTextColor(svg);
         _drawFixedXaxis();
         _drawUserDataBar(svg);
         _drawWarning(svg);

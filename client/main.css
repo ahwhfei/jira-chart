@@ -128,6 +128,26 @@ body {
     fill: #888888 !important;
 }
 
+.yaxis-text-frontend {
+    fill: #9467bd !important;
+}
+
+.yaxis-text-backend {
+
+}
+
+.yaxis-text-test {
+    fill: #17becf !important;
+}
+
+.yaxis-text-devops {
+    fill: #4BADE8 !important;
+}
+
+.yaxis-text-3p {
+    fill: #888888 !important;
+}
+
 .current-line {
     stroke: red;
     stroke-width: 3px;
