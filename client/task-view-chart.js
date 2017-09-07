@@ -51,19 +51,20 @@ function drawTaskViewChart(data) {
 
     ChartHeight().set(height);
 
-    const lowDate = new Date(minDate(cachedData));
-    const topDate = new Date(maxDate(cachedData));
+    const lowDate = minDate(cachedData, manifest.bottomDays);
+    const topDate = maxDate(cachedData, manifest.topDays);
 
     if (lowDate == 'Invalid Date' || topDate == 'Invalid Date') {
-        console.error('Invalid Data');
-        return;
+        throw 'Invalid Data';
     }
 
-    lowDate.setDate(lowDate.getDate() - 10);
-    topDate.setDate(topDate.getDate() + 10);
+    const [lowDateWithMargin, topDateWithMargin] = [
+        new Date(lowDate).setDate(lowDate.getDate() - 2),
+        new Date(topDate).setDate(topDate.getDate() + 2),
+    ];
 
     let xScale = d3.time.scale()
-        .domain([lowDate, topDate])
+        .domain([lowDateWithMargin, topDateWithMargin])
         .range([20, width]);
 
     let yScale = d3.scale.ordinal()
@@ -142,7 +143,9 @@ function drawTaskViewChart(data) {
     let color = (c) => colorType[c];
 
     svg.selectAll('.rect')
-        .data(cachedData)
+        .data(cachedData.filter(d => 
+            new Date(d[DATAFIELDS.plannedStart]) < topDate
+            && new Date(d[DATAFIELDS.plannedEnd] ) > lowDate))
         .enter()
         .append('rect')
         .attr('class', 'rect')
@@ -150,7 +153,13 @@ function drawTaskViewChart(data) {
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
         .attr('x', (d) => {
             if (d[DATAFIELDS.plannedStart]) {
-                return xScale(new Date(d[DATAFIELDS.plannedStart]));
+                const plannedStart = new Date(d[DATAFIELDS.plannedStart]);
+                
+                if (plannedStart < lowDate) {
+                    return xScale(lowDate);
+                }
+
+                return xScale(plannedStart);
             }
         })
         .attr('y', (d) => {
@@ -167,7 +176,14 @@ function drawTaskViewChart(data) {
         .duration(1000)
         .attr('width', (d) => {
             if (d[DATAFIELDS.plannedEnd] && d[DATAFIELDS.plannedStart]) {
-                return xScale(new Date(d[DATAFIELDS.plannedEnd])) - xScale(new Date(d[DATAFIELDS.plannedStart]));
+                const plannedEnd = new Date(d[DATAFIELDS.plannedEnd]);
+                const plannedStart = new Date(d[DATAFIELDS.plannedStart]);
+
+                if (plannedEnd > topDate) {
+                    return xScale(topDate) - (plannedStart > lowDate ? xScale(plannedStart) : xScale(lowDate));             
+                }
+
+                return xScale(plannedEnd) - (plannedStart > lowDate ? xScale(plannedStart) : xScale(lowDate));
             }
         })
 

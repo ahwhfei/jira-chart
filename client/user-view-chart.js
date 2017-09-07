@@ -10,28 +10,31 @@ function drawUserViewChart(cachedData) {
     let assigneeList = _getSortedAssigneeList();
     const [width, height, barHeight] = _determineWidthHeight();
     const [lowDate, topDate] = _determineXAxisLimit();
+    const [lowDateWithMargin, topDateWithMargin] = [
+        new Date(lowDate).setDate(lowDate.getDate() - 5),
+        new Date(topDate).setDate(topDate.getDate() + 5),
+    ];
     const [xScale, yScale] = _createXYScale();
     const [xAxis, yAxis] = _createXYAxis();
 
     function _determineXAxisLimit() {
-        let dataWithDate = cachedData.filter(d => users[d[DATAFIELDS.assignee]] && (d[DATAFIELDS.plannedEnd] || d[DATAFIELDS.plannedStart]));
-        let lowDate = new Date(minDate(dataWithDate));
-        let topDate = new Date(maxDate(dataWithDate));
+        let dataWithDate = cachedData.filter(d => 
+            users[d[DATAFIELDS.assignee]] 
+                && !users[d[DATAFIELDS.assignee]].hidden 
+                && (d[DATAFIELDS.plannedEnd] || d[DATAFIELDS.plannedStart]));
+        let lowDate = minDate(dataWithDate, manifest.bottomDays);
+        let topDate = maxDate(dataWithDate, manifest.topDays);
 
         if (lowDate == 'Invalid Date' || topDate == 'Invalid Date') {
-            console.error('Invalid Data');
-            return;
+            throw 'Invalid Data';
         }
-
-        lowDate.setDate(lowDate.getDate() - 10);
-        topDate.setDate(topDate.getDate() + 10);
         
         return [lowDate, topDate];
     }
 
     function _createXYScale() {
         let xScale = d3.time.scale()
-            .domain([lowDate, topDate])
+            .domain([lowDateWithMargin, topDateWithMargin])
             .range([20, width]);
 
         let yScale = d3.scale.ordinal()
@@ -64,7 +67,10 @@ function drawUserViewChart(cachedData) {
 
     function _getSortedAssigneeList() {
         let assignees = _getAssigneeList();
-        let dataWithPlannedEndDate = cachedData.filter(d => users[d[DATAFIELDS.assignee]] && d[DATAFIELDS.plannedEnd]);
+        let dataWithPlannedEndDate = cachedData.filter(d => 
+            users[d[DATAFIELDS.assignee]] 
+            && !users[d[DATAFIELDS.assignee]].hidden 
+            && d[DATAFIELDS.plannedEnd]);
 
         for (const d of dataWithPlannedEndDate) {
             if (!users[d[DATAFIELDS.assignee]].maxPlannedEnd 
@@ -165,9 +171,9 @@ function drawUserViewChart(cachedData) {
             .append('rect')
             .attr('class', 'axis-rect')
             .attr('fill', (d, i) => i % 2 === 0 ? '#EEE' : '#E7E7E7')
-            .attr('x', d => xScale(lowDate)-margin.left)
+            .attr('x', d => xScale(lowDateWithMargin)-margin.left)
             .attr('y', d => yScale(d))
-            .attr('width', xScale(topDate)+margin.left)
+            .attr('width', xScale(topDateWithMargin)+margin.left)
             .attr('height', barHeight+barPadding);
     }
 
@@ -204,7 +210,13 @@ function drawUserViewChart(cachedData) {
             .attr('class', 'rect')
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
             .selectAll('.rect')
-            .data(cachedData.filter(d => d[DATAFIELDS.plannedEnd] && d[DATAFIELDS.plannedStart] && users[d[DATAFIELDS.assignee]]))
+            .data(cachedData.filter(d => 
+                d[DATAFIELDS.plannedEnd] 
+                && d[DATAFIELDS.plannedStart] 
+                && new Date(d[DATAFIELDS.plannedStart]) < topDate
+                && new Date(d[DATAFIELDS.plannedEnd] ) > lowDate
+                && users[d[DATAFIELDS.assignee]] 
+                && !users[d[DATAFIELDS.assignee]].hidden))
             .enter()
             .append('rect')
             .attr('fill', (d, i) => {
@@ -213,7 +225,13 @@ function drawUserViewChart(cachedData) {
             })
             .attr('x', (d) => {
                 if (d[DATAFIELDS.plannedStart]) {
-                    return xScale(new Date(d[DATAFIELDS.plannedStart]));
+                    const plannedStart = new Date(d[DATAFIELDS.plannedStart]);
+                    
+                    if (plannedStart < lowDate) {
+                        return xScale(lowDate);
+                    }
+
+                    return xScale(plannedStart);
                 }
             })
             .attr('y', (d) => {
@@ -251,14 +269,24 @@ function drawUserViewChart(cachedData) {
             .duration(1000)
             .attr('width', (d) => {
                 if (d[DATAFIELDS.plannedStart]) {
-                    return xScale(new Date(d[DATAFIELDS.plannedEnd])) - xScale(new Date(d[DATAFIELDS.plannedStart]));
+                    const plannedEnd = new Date(d[DATAFIELDS.plannedEnd]);
+                    const plannedStart = new Date(d[DATAFIELDS.plannedStart]);
+
+                    if (plannedEnd > topDate) {
+                        return xScale(topDate) - (plannedStart > lowDate ? xScale(plannedStart) : xScale(lowDate));             
+                    }
+
+                    return xScale(plannedEnd) - (plannedStart > lowDate ? xScale(plannedStart) : xScale(lowDate));
                 }
             });
     }
 
     function _drawWarning(svg) {
         // Show warning if planned start or planned end date not set
-        let dataWithoutPlannedStartOrEnd = cachedData.filter(d => users[d[DATAFIELDS.assignee]] && (!d[DATAFIELDS.plannedEnd] || !d[DATAFIELDS.plannedStart]));
+        let dataWithoutPlannedStartOrEnd = cachedData.filter(
+            d => users[d[DATAFIELDS.assignee]] 
+                    && !users[d[DATAFIELDS.assignee]].hidden 
+                    && (!d[DATAFIELDS.plannedEnd] || !d[DATAFIELDS.plannedStart]));
         svg.append('g')
             .attr('class', 'warning')
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
@@ -271,7 +299,7 @@ function drawUserViewChart(cachedData) {
 
                 let index = dataByAssignee.findIndex(o => o[DATAFIELDS.issueKey] === d[DATAFIELDS.issueKey]);
 
-                return xScale(lowDate) + index*16;
+                return xScale(lowDateWithMargin) + index*16;
             })
             .attr('y', d => {
                 return yScale(d[DATAFIELDS.assignee]) + (barHeight + barPadding) / 2 + 10;

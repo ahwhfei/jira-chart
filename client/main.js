@@ -74,7 +74,7 @@ let controller =
     }
 
     function fetchCachedDataAndDrawChart() {
-        d3.json(`${manifest.host}/jiracached`, function (error, data) {
+        d3.json('/jiracached', function (error, data) {
             console.table(data);
 
             if (error || !data || !data.length) {
@@ -88,7 +88,7 @@ let controller =
     }
 
     function fetchDataAndDrawChart() {
-        d3.csv(`${manifest.host}/jira?url=${manifest.jiraUrl}`, function (error, data) {
+        d3.csv(`/jira?url=${manifest.jiraUrl}`, function (error, data) {
             console.log(data);
             hideLoading();
             cachedData = data;
