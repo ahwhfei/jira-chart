@@ -1,6 +1,7 @@
 (function () {
     'use strict';
     const https = require('https');
+    const {URL} = require('url');
     const d3 = require('d3-dsv');
     const xml2js = require('xml2js');
     const parseString = xml2js.parseString;
@@ -8,12 +9,30 @@
     const config = require('./config.json');
 
     let cachedData = [];
+    let isDateIntegrity = true;
 
     console.log(`Worker PID #${process.pid} at ${new Date()}`);
 
     function fetchJiraData(url) {
         return new Promise((resolve, reject) => {
-            https.get(url, (res) => {
+            const urlOptions = new URL(url);
+    
+            const options = {
+                host: urlOptions.host,
+                path: urlOptions.pathname + urlOptions.search,
+                headers: {
+                    'Authorization': 'Basic ' + new Buffer(config.username + ':' + config.password).toString('base64')
+                } 
+            }
+
+            https.get(options, (res) => {
+                const { statusCode } = res;
+
+                if (statusCode !== 200) {
+                    isDateIntegrity = false;
+                    reject({message: `HTTPS GET ${url} Status code is ${statusCode}`});
+                }
+
                 let rawData = '';
                 res.on('data', (chunk) => rawData += chunk);
 
@@ -21,8 +40,8 @@
                     resolve(rawData);
                 });
             }).on('error', (e) => {
-                console.log(`Got error: ${e.message}`);
-                reject();
+                isDateIntegrity = false;
+                reject(e);
             });
         });
     }
@@ -43,6 +62,9 @@
 
             let p = fetchJiraData(issueUrl).then(data => {
                 return parseIssueXMLData(data);
+            }).catch(err => {
+                isDateIntegrity = false;
+                console.log(err.message);
             });
 
             promiseList.push(p);
@@ -59,6 +81,9 @@
             }, (err, result) => {
                 parseIssueJsonData(result).then(() => {
                     resolve();
+                }).catch(err => {
+                    isDateIntegrity = false;
+                    reject(err);
                 });
             });
         });
@@ -143,13 +168,14 @@
 
     function run() {
         cachedData = [];
+        isDateIntegrity = true;
 
         const url = config.jiraUrl;
-
+        
         fetchJiraData(url).then(data => {
             return _getIssueList(data);
         }).then(() => {
-            if (cachedData && cachedData.length) {
+            if (isDateIntegrity && cachedData && cachedData.length) {
                 process.send(cachedData);
                 console.log(`Fetched Data Count: ${cachedData.length} records at ${new Date()}`);
             }
