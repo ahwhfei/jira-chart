@@ -161,7 +161,9 @@
         issue['Issue Type'] = item.type['_'];
         issue['Priority'] = item.priority['_'];
 
-        cachedData.push(issue);
+        if (cachedData.findIndex(e => e['Issue key'] === issue['Issue key']) === -1) {
+            cachedData.push(issue);
+        }
 
         return promise || Promise.resolve();
     }
