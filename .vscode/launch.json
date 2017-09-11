@@ -10,6 +10,12 @@
             "request": "launch",
             "name": "worker",
             "program": "${workspaceRoot}\\worker.promise.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "backstage",
+            "program": "${workspaceRoot}/tools/fetch-backstage.js"
         }
     ]
 }
