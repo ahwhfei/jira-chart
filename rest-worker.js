@@ -5,6 +5,8 @@
     const config = require('./config');
     const DATAFIELDS = require('./data-field');
 
+    console.log(`REST Worker PID #${process.pid} at ${new Date().toLocaleString()}`);
+
     let prettyData = [];
 
     function callJiraApi() {
@@ -115,7 +117,7 @@
 
         callJiraApi().then((rawData) => {
             formatData(rawData).then((data) => {
-                console.log(`2/2 Fetched Data Count: ${prettyData.length} records at ${new Date().toLocaleString()}`);
+                console.log(`REST worker Fetched Data Count: ${prettyData.length} records at ${new Date().toLocaleString()}`);
                 process.send(prettyData);
                 setTimeout(() => run(), config.fetchDataInterval * 1000);
             });

@@ -46,7 +46,7 @@ let controller =
         for (const d of cachedData) {
             cachedFlattenDeveloperData.push(d);
             
-            if (!d[DATAFIELDS.developers] || (d[DATAFIELDS.subtask] && !d[DATAFIELDS.subtask].length)) {
+            if (!d[DATAFIELDS.developers] || (d[DATAFIELDS.subtask] && d[DATAFIELDS.subtask].length)) {
                 continue;
             }
 

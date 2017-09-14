@@ -12,10 +12,16 @@
     const http = require('http');
     const childProcess = require('child_process');
     const cache = require('memory-cache');
+    const config = require('./config');
 
     function forkWorkerProcess() {
-        // const worker = childProcess.fork('./worker.promise');
-        const worker = childProcess.fork('./call-jira-api');
+        let worker;
+        
+        if (config.workerType === 'XML') {
+            worker = childProcess.fork('./xml-worker');
+        } else if (config.workerType === 'REST') {
+            worker = childProcess.fork('./rest-worker');
+        }
         worker.on('message', (data) => {
             cache.put('cacached', data);
         });

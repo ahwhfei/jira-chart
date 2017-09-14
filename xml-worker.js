@@ -11,7 +11,7 @@
     let cachedData = [];
     let isDateIntegrity = true;
 
-    console.log(`Worker PID #${process.pid} at ${new Date()}`);
+    console.log(`XML Worker PID #${process.pid} at ${new Date().toLocaleString()}`);
 
     function fetchJiraData(url) {
         return new Promise((resolve, reject) => {
@@ -178,7 +178,7 @@
             return _getIssueList(data);
         }).then(() => {
             if (isDateIntegrity && cachedData && cachedData.length) {
-                console.log(`Fetched Data Count: ${cachedData.length} records at ${new Date()}`);
+                console.log(`XML worker Fetched Data Count: ${cachedData.length} records at ${new Date().toLocaleString()}`);
                 // process.send(cachedData);
             }
 

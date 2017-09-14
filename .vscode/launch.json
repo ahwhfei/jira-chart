@@ -9,7 +9,7 @@
             "type": "node",
             "request": "launch",
             "name": "worker",
-            "program": "${workspaceRoot}\\worker.promise.js"
+            "program": "${workspaceRoot}\\xml-worker.js"
         },
         {
             "type": "node",
@@ -21,7 +21,7 @@
             "type": "node",
             "request": "launch",
             "name": "jiraSearch",
-            "program": "${workspaceRoot}/call-jira-api.js"
+            "program": "${workspaceRoot}/rest-worker.js"
         }
     ]
 }
