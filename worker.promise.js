@@ -6,7 +6,7 @@
     const xml2js = require('xml2js');
     const parseString = xml2js.parseString;
     
-    const config = require('./config.json');
+    const config = require('./config');
 
     let cachedData = [];
     let isDateIntegrity = true;
@@ -178,8 +178,8 @@
             return _getIssueList(data);
         }).then(() => {
             if (isDateIntegrity && cachedData && cachedData.length) {
-                process.send(cachedData);
                 console.log(`Fetched Data Count: ${cachedData.length} records at ${new Date()}`);
+                // process.send(cachedData);
             }
 
             setTimeout(() => run(), config.fetchDataInterval * 1000);

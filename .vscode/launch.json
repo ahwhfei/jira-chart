@@ -16,6 +16,12 @@
             "request": "launch",
             "name": "backstage",
             "program": "${workspaceRoot}/tools/fetch-backstage.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "jiraSearch",
+            "program": "${workspaceRoot}/call-jira-api.js"
         }
     ]
 }

@@ -14,7 +14,8 @@
     const cache = require('memory-cache');
 
     function forkWorkerProcess() {
-        const worker = childProcess.fork('./worker.promise');
+        // const worker = childProcess.fork('./worker.promise');
+        const worker = childProcess.fork('./call-jira-api');
         worker.on('message', (data) => {
             cache.put('cacached', data);
         });
