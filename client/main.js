@@ -119,17 +119,14 @@ let controller =
     function hideLoading(updatedTime) {
         document.getElementById('loading').style.display = 'none';
         document.getElementById('container').style.display = 'block';
-        document.getElementById('updated-time').style.display = 'inline-block';
         document.getElementById('updated-time').innerText = `Sync data at ${new Date(updatedTime).toLocaleString()}` || '';
         document.getElementById('sync-data-btn').removeAttribute('disabled');
     }
 
     function showLoading() {
         console.log('loading...');
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('container').style.display = 'none';
         document.getElementById('sync-data-btn').setAttribute('disabled', 'disabled');
-        document.getElementById('updated-time').style.display = 'none';
+        document.getElementById('updated-time').innerText = 'Loading...';
     }
 
     function _configureSite() {

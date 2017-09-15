@@ -13,7 +13,10 @@
             const value = {updatedTime: new Date(), data: data};
             cache.put('cacached', value);
             response.send(value);
-        }).catch(() => response.send(null));
+        }).catch((error) => {
+            console.log(error);
+            response.send(null);
+        });
     });
 
     module.exports = router;
