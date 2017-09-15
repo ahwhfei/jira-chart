@@ -4,6 +4,7 @@
     const request = require('request').defaults({encoding: null});
     const config = require('./config');
     const DATAFIELDS = require('./data-field');
+    const httpsClient = require('./https-client');
 
     console.log(`REST Worker PID #${process.pid} at ${new Date().toLocaleString()}`);
 
@@ -13,38 +14,30 @@
         let rawData = [];
 
         function _callSearchApi(startAt) {
-            return new Promise((resolve, reject) => {
-                request.get(config.jiraSearchApi, {
-                    qs: {
-                        jql: config.jiraJql,
-                        startAt: startAt,
-                        maxResults: config.jiraMaxResults,
-                        fields: '*all'
+            let url = `${config.jiraSearchApi}`;
+            const parameters = {
+                jql: config.jiraJql,
+                startAt: startAt,
+                maxResults: config.jiraMaxResults,
+                fields: config.jiraFields
+            }
+
+            return httpsClient.post(url, parameters)
+                .then(body => {
+                    const data = JSON.parse(body);
+
+                    if (data.issues.length > 0) {
+                        rawData.push(...data.issues);
                     }
-                }, (error, response, body) => {
-                    if (error || response.statusCode !== 200) {
-                        console.log(error || `Response Status code ${response.statusCode}`);
-                        reject();
+
+                    if (startAt + data.issues.length < data.total) {
+                        return _callSearchApi(startAt + data.issues.length);
+                    } else {
+                        return rawData;
                     }
-        
-                    try {
-                        const data = JSON.parse(body);
-    
-                        if (data.issues.length > 0) {
-                            rawData.push(...data.issues);
-                        }
-    
-                        if (startAt + data.issues.length < data.total) {
-                            _callSearchApi(startAt + data.issues.length).then(() => resolve());
-                        } else {
-                            resolve(rawData);
-                        }
-                    } catch (error) {
-                        console.log(error);
-                        reject();
-                    }
+                }).catch(error => {
+                    console.log(error);
                 });
-            });
         }
 
         return _callSearchApi(0);
@@ -70,22 +63,14 @@
     }
 
     function getJiraIssue(key) {
-        return new Promise((resolve, reject) => {
-            request.get(`${config.jiraIssueApi}${key}`, (error, response, body) => {
-                if (error || response.statusCode !== 200) {
-                    reject(error || `Response Status code ${response.statusCode}`);
-                }
 
-                try {
-                    const issue = JSON.parse(body);
-                    const s = getValues(issue);
-
-                    resolve(s);
-                } catch (error) {
-                    reject(error);
-                }
+        return httpsClient.get(`${config.jiraIssueApi}${key}`)
+            .then(body => {
+                const issue = JSON.parse(body);
+                return getValues(issue);
+            }).catch(error => {
+                console.log(error);
             });
-        });
     }
 
     function formatData(data) {
@@ -102,11 +87,11 @@
                 continue;
             }
                 
-            for (const t of d.fields.subtasks) {
-                const p = getJiraIssue(t.key).then(issue => prettyData.push(issue));
+            // for (const t of d.fields.subtasks) {
+            //     const p = getJiraIssue(t.key).then(issue => prettyData.push(issue));
 
-                promiseList.push(p);
-            }       
+            //     promiseList.push(p);
+            // }
         }
 
         return Promise.all(promiseList).then(() => prettyData);

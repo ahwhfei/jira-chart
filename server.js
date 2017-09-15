@@ -17,11 +17,17 @@
     function forkWorkerProcess() {
         let worker;
         
-        if (config.workerType === 'XML') {
-            worker = childProcess.fork('./xml-worker');
-        } else if (config.workerType === 'REST') {
-            worker = childProcess.fork('./rest-worker');
+        switch (config.workerType) {
+            case 'XML':
+                worker = childProcess.fork('./xml-worker');
+                break;
+            case 'REST':
+                worker = childProcess.fork('./rest-worker');
+                break;
+            default: 
+                break;
         }
+
         worker.on('message', (data) => {
             cache.put('cacached', data);
         });
