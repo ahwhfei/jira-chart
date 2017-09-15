@@ -13,7 +13,10 @@
             <button class="control-button" onclick="controller.showAssigneeView()">Assignee View</button>
             <!--<button class="control-button" onclick="controller.forceFreshData()" title="Will not use cached data, do not fetch subtasks">Use Fresh Data</button>-->
             <button class="control-button" onclick="controller.showAssigneeAndDeveloperView()">Assignee + Developer View</button>
+            <button id="sync-data-btn" class="control-button" onclick="controller.forceFreshData()">Sync Data</button>
+            <span id="updated-time"></span>
             <div class="setting"><span onclick="controller.configureSite()">K</span></div>
+            <div class="setting"></div>
         </div>
         <span id="loading">Loading...</span>
         <div id="container">

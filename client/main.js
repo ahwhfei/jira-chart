@@ -74,24 +74,28 @@ let controller =
     }
 
     function fetchCachedDataAndDrawChart() {
-        d3.json('/jiracached', function (error, data) {
-            console.table(data);
+        d3.json('/jiracached', function (error, response) {
+            console.table(response.data);
 
-            if (error || !data || !data.length) {
+            if (error || !response.data || !response.data.length) {
                 fetchDataAndDrawChart();
             } else {
-                hideLoading();
-                cachedData = data;
+                cachedData = response.data;
+                const updatedTime = response.updatedTime;
+                hideLoading(updatedTime);
                 drawChart();
             }           
         })
     }
 
     function fetchDataAndDrawChart() {
-        d3.csv(`/jira?url=${manifest.jiraUrl}`, function (error, data) {
-            console.log(data);
-            hideLoading();
-            cachedData = data;
+        showLoading();
+
+        d3.json(`/jira`, function (error, response) {
+            console.table(response.data);
+            const updatedTime = response.updatedTime;
+            hideLoading(updatedTime);
+            cachedData = response.data;
             drawChart();
         });
     }
@@ -112,10 +116,20 @@ let controller =
         window.setInterval(() => fetchCachedDataAndDrawChart(), 3600 * 1000);
     }
 
-    function hideLoading() {
-        let loading = document.getElementById('loading');
-        loading && loading.parentNode.removeChild(loading);
+    function hideLoading(updatedTime) {
+        document.getElementById('loading').style.display = 'none';
         document.getElementById('container').style.display = 'block';
+        document.getElementById('updated-time').style.display = 'inline-block';
+        document.getElementById('updated-time').innerText = `Sync data at ${new Date(updatedTime).toLocaleString()}` || '';
+        document.getElementById('sync-data-btn').removeAttribute('disabled');
+    }
+
+    function showLoading() {
+        console.log('loading...');
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('container').style.display = 'none';
+        document.getElementById('sync-data-btn').setAttribute('disabled', 'disabled');
+        document.getElementById('updated-time').style.display = 'none';
     }
 
     function _configureSite() {

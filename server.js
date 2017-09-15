@@ -29,7 +29,7 @@
         }
 
         worker.on('message', (data) => {
-            cache.put('cacached', data);
+            cache.put('cacached', {updatedTime: new Date(), data: data});
         });
         worker.on('exit', (code) => {
             console.log(`Worker PID #${worker.pid} Exit with Code: ${code}`);

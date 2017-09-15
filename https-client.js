@@ -56,7 +56,7 @@
                 const { statusCode } = res;
 
                 if (statusCode !== 200) {
-                    reject({message: `HTTPS GET ${url} Status code is ${statusCode}`});
+                    reject({message: `HTTPS POST ${url} Status code is ${statusCode}`});
                 }
 
                 let rawData = '';

@@ -5,21 +5,15 @@
     let express = require('express'),
         router = express.Router();
 
-    const https = require('https');
+    const jiraData = require('../jira-data');
+    const cache = require('memory-cache');
 
     router.get('/', function (req, response) {
-        const url = req.query['url'];
-        console.log(url);
-        https.get(url, (res) => {
-            let rawData = '';
-            res.on('data', (chunk) => rawData += chunk);
-
-            res.on('end', () => {
-                response.send(rawData);
-            });
-        }).on('error', (e) => {
-            console.log(`Got error: ${e.message}`);
-        });
+        jiraData.get(req.ip).then(data => {
+            const value = {updatedTime: new Date(), data: data};
+            cache.put('cacached', value);
+            response.send(value);
+        }).catch(() => response.send(null));
     });
 
     module.exports = router;
