@@ -131,7 +131,7 @@ let controller =
 
     function _configureSite() {
         console.log('xxxx')
-        // document.getElementById('container').innerHTML = '';
+        document.getElementById('container').innerHTML = '';
     }
 
     init();
