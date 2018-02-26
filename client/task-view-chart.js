@@ -137,6 +137,7 @@ function drawTaskViewChart(data) {
         story: '#63BA3C',
         task: '#4BADE8',
         bug: '#d62728',
+        epic: '#904ee2',
         'sub-task': '#9467bd'
     }
 
