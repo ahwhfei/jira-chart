@@ -8,13 +8,14 @@
 
     
 
-    function callJiraApi() {
+    function callJiraApi(jql) {
         let rawData = [];
+        console.log(jql);
 
         function _callSearchApi(startAt) {
             let url = `${config.jiraSearchApi}`;
             const parameters = {
-                jql: config.jiraJql,
+                jql: jql || config.jiraJql,
                 startAt: startAt,
                 maxResults: config.jiraMaxResults,
                 fields: config.jiraFields
@@ -83,8 +84,8 @@
         return prettyData;
     }
 
-    function getJiraData(source) {
-        return callJiraApi().then(rawData => {
+    function getJiraData(source, jql) {
+        return callJiraApi(jql).then(rawData => {
             const data = formatData(rawData);
             
             source && console.log(`Source: ${source} Record: ${data.length} at ${new Date().toLocaleString()}`);

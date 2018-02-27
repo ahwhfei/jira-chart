@@ -24,11 +24,14 @@ function getElementIfNotExistCreateNewOne(elementId, containerId) {
 function clearElement(elementId, containerId) {
     let element = getElementIfNotExistCreateNewOne(elementId, containerId);
     element.innerHTML = '';
+
+    let settingsElement = document.getElementById('setting-container');
+    settingsElement && settingsElement.parentNode.removeChild(settingsElement);
 }
 
 function drawTaskViewChart(data) {
     clearElement('figure', 'container');
-
+    
     cachedData = data.filter((d) => {
         return users[d[DATAFIELDS.assignee]]
             && d[DATAFIELDS.plannedEnd]

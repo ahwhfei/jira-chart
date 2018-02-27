@@ -59,6 +59,9 @@ function drawUserViewChart(cachedData) {
     function clearElement(elementId, containerId) {
         let element = getElementIfNotExistCreateNewOne(elementId, containerId);
         element.innerHTML = '';
+
+        let settingsElement = document.getElementById('setting-container');
+        settingsElement && settingsElement.parentNode.removeChild(settingsElement);
     }
 
     function _createSvg() {

@@ -206,3 +206,18 @@ body {
     font-size: 12px;
     color: #1f77b4;
 }
+
+#setting-container {
+    margin-bottom: 20px;
+}
+
+.jql-area {
+    width: 100%;
+    text-align: center;
+}
+
+#jql-textbox {
+    width: 90%;
+    height: 103px;
+    overflow: hidden;
+}

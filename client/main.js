@@ -6,7 +6,8 @@ let controller =
     let viewType = {
         task: 'task',
         assignee: 'assignee',
-        developer: 'developer'
+        developer: 'developer',
+        configuration: 'configuration'
     };
     let chartType = viewType.task;
 
@@ -101,7 +102,11 @@ let controller =
     }
 
     function init() {
-        fetchCachedDataAndDrawChart();
+        if (Cookies.get('jql')) {
+            fetchDataAndDrawChart();
+        } else {
+            fetchCachedDataAndDrawChart();
+        }
 
         window.addEventListener('resize', () => {
             drawChart();
@@ -129,9 +134,86 @@ let controller =
         document.getElementById('updated-time').innerText = 'Loading...';
     }
 
+    function onKeyUp(event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            const textbox = document.getElementById('jql-textbox');
+            Cookies.put('jql', textbox.value);
+            fetchDataAndDrawChart();
+        }
+    }
+
+    function onKeyDown(event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+        }
+    }
+
     function _configureSite() {
-        console.log('xxxx')
-        document.getElementById('container').innerHTML = '';
+        chartType = viewType.configuration;
+        document.getElementById('container').innerHTML = `
+            <div id="setting-container">
+                <div class="jql-area">
+                    <div>
+                        <input type="checkbox" id="defaultJql">
+                        <label for="defaultJql">Use Default Jql</label>
+                    </div>
+                    <textarea id="jql-textbox"></textarea>
+                </div>
+            </div>
+        `;
+
+        const textbox = document.getElementById('jql-textbox');
+        textbox.addEventListener('keyup', onKeyUp);
+        textbox.addEventListener('keydown', onKeyDown);
+
+        const defaultJqlCheckbox = document.getElementById('defaultJql');
+        defaultJqlCheckbox.addEventListener('change', onChangeTextBoxStatus);
+        if (hasJqlCookie()) {
+            defaultJqlCheckbox.checked = false;
+            textbox.value = Cookies.get('jql');
+        } else {
+            _getJql().then(jql => {
+                textbox.value = jql;
+            });
+            defaultJqlCheckbox.checked = true;
+        }
+
+        textbox.disabled = defaultJqlCheckbox.checked;        
+
+        function onChangeTextBoxStatus(event) {
+            textbox.disabled = defaultJqlCheckbox.checked;
+            if (defaultJqlCheckbox.checked) {
+                Cookies.remove('jql');
+
+                fetchCachedDataAndDrawChart(); 
+                
+                _getJql().then(jql => {
+                    textbox.value = jql;
+                });
+            }
+        }
+    }
+
+    
+
+    function hasJqlCookie() {
+        return !!Cookies.get('jql');
+    }
+
+    function _getJql() {
+        return fetch('/jql').then(response => {
+            if (response.status !== 200) {
+                console.log('Looks like there was a problem. Status Code: ' + response.status);
+                return;
+            }
+
+            return response.text().then(data => {
+                return data;
+            })
+        }).catch(err => {
+            console.error(err);
+        });
     }
 
     init();
