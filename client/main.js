@@ -75,29 +75,44 @@ let controller =
     }
 
     function fetchCachedDataAndDrawChart() {
-        d3.json('/jiracached', function (error, response) {
-            console.table(response.data);
 
-            if (error || !response.data || !response.data.length) {
+        fetch(`/jiracached`).then(response => {
+            if (response.status !== 200) {
                 fetchDataAndDrawChart();
-            } else {
-                cachedData = response.data;
-                const updatedTime = response.updatedTime;
+                return;
+            }
+
+            response.json().then(res => {
+                console.table(res.data);
+                const updatedTime = res.updatedTime;
                 hideLoading(updatedTime);
+                cachedData = res.data;
                 drawChart();
-            }           
-        })
+            });
+        }).catch(err => {
+            console.error(err);
+            fetchDataAndDrawChart();
+        });
     }
 
     function fetchDataAndDrawChart() {
         showLoading();
 
-        d3.json(`/jira`, function (error, response) {
-            console.table(response.data);
-            const updatedTime = response.updatedTime;
-            hideLoading(updatedTime);
-            cachedData = response.data;
-            drawChart();
+        fetch(`/jira`).then(response => {
+            if (response.status !== 200) {
+                console.log('Looks like there was a problem. Status Code: ' + response.status);
+                return;
+            }
+
+            response.json().then(res => {
+                console.table(res.data);
+                const updatedTime = res.updatedTime;
+                hideLoading(updatedTime);
+                cachedData = res.data;
+                drawChart();
+            });
+        }).catch(err => {
+            console.error(err);
         });
     }
 
@@ -187,7 +202,7 @@ let controller =
                 Cookies.remove('jql');
 
                 fetchCachedDataAndDrawChart(); 
-                
+
                 _getJql().then(jql => {
                     textbox.value = jql;
                 });

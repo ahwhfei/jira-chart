@@ -65,7 +65,7 @@ window.Cookies = window.Cookies || (function() {
         remove: function(name) {
             var domain = _getDomain();
             document.cookie = name + '=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            document.cookie = name + '=; path=/; domain=' + domain + '; expires=Thu, 01 Jan 1970 00:00:01 GMT; secure';
+            document.cookie = name + '=; path=/; domain=' + domain + '; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         },
 
         //except: list of elements that should not be excluded
