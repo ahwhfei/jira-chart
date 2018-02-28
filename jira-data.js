@@ -34,8 +34,6 @@
                     } else {
                         return rawData;
                     }
-                }).catch(error => {
-                    console.log(error);
                 });
         }
 

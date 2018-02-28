@@ -15,7 +15,8 @@
             response.send(value);
         }).catch((error) => {
             console.log(error);
-            response.send(null);
+            response.status(400);
+            response.send(error);
         });
     });
 

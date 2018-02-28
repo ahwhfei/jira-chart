@@ -95,13 +95,17 @@ let controller =
         });
     }
 
+    // return true means failure calling
     function fetchDataAndDrawChart() {
         showLoading();
 
-        fetch(`/jira`).then(response => {
+        return fetch(`/jira`, {
+            credentials: 'include'
+        }).then(response => {
             if (response.status !== 200) {
                 console.log('Looks like there was a problem. Status Code: ' + response.status);
-                return;
+                hideLoading(null, true);
+                return true;
             }
 
             response.json().then(res => {
@@ -113,6 +117,8 @@ let controller =
             });
         }).catch(err => {
             console.error(err);
+            hideLoading(null, true);
+            return true;
         });
     }
 
@@ -136,10 +142,15 @@ let controller =
         window.setInterval(() => fetchCachedDataAndDrawChart(), 3600 * 1000);
     }
 
-    function hideLoading(updatedTime) {
+    function hideLoading(updatedTime, isFailed) {
+        _hideLoading();
+        isFailed ? document.getElementById('updated-time').innerText = 'Bad request' 
+            : document.getElementById('updated-time').innerText = `Sync data at ${new Date(updatedTime).toLocaleString()}` || '';
+    }
+
+    function _hideLoading() {
         document.getElementById('loading').style.display = 'none';
         document.getElementById('container').style.display = 'block';
-        document.getElementById('updated-time').innerText = `Sync data at ${new Date(updatedTime).toLocaleString()}` || '';
         document.getElementById('sync-data-btn').removeAttribute('disabled');
     }
 
@@ -154,7 +165,9 @@ let controller =
             event.preventDefault();
             const textbox = document.getElementById('jql-textbox');
             Cookies.put('jql', textbox.value);
-            fetchDataAndDrawChart();
+            fetchDataAndDrawChart().then(isFailed => {
+                isFailed && Cookies.remove('jql');
+            });
         }
     }
 
@@ -166,6 +179,7 @@ let controller =
 
     function _configureSite() {
         chartType = viewType.configuration;
+        _hideLoading();
         document.getElementById('container').innerHTML = `
             <div id="setting-container">
                 <div class="jql-area">
