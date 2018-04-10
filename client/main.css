@@ -214,10 +214,21 @@ body {
 .jql-area {
     width: 100%;
     text-align: center;
+    margin-top: 15px;
 }
 
 #jql-textbox {
     width: 90%;
     height: 103px;
     overflow: hidden;
+}
+
+.dropdown-container {
+    float: left;
+    position: relative;
+    padding-right: 5px;
+}
+
+.setting-container-top {
+    padding-left: 40px;
 }
