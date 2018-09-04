@@ -9,9 +9,29 @@ function ChartHeight() {
     }
 }
 
-function drawTaskViewChart(data) {
-    document.getElementById('figure').innerHTML = '';
+function getElementIfNotExistCreateNewOne(elementId, containerId) {
+    let element = document.getElementById(elementId);
+    if (!element) {
+        const container = document.getElementById(containerId);
+        element = document.createElement('div');
+        element.setAttribute('id', elementId);
+        container.appendChild(element);
+    }
 
+    return element;
+}
+
+function clearElement(elementId, containerId) {
+    let element = getElementIfNotExistCreateNewOne(elementId, containerId);
+    element.innerHTML = '';
+
+    let settingsElement = document.getElementById('setting-container');
+    settingsElement && settingsElement.parentNode.removeChild(settingsElement);
+}
+
+function drawTaskViewChart(data) {
+    clearElement('figure', 'container');
+    
     cachedData = data.filter((d) => {
         return users[d[DATAFIELDS.assignee]]
             && d[DATAFIELDS.plannedEnd]
@@ -28,7 +48,8 @@ function drawTaskViewChart(data) {
     let barHeight = 18;
     const barPadding = 6;
     const axisFontHeight = 17;
-    let width = document.getElementById('figure').clientWidth - margin.left - margin.right;
+    const figure = getElementIfNotExistCreateNewOne('figure', 'container');
+    let width = figure.clientWidth - margin.left - margin.right;
     let height = cachedData.length * (barHeight + barPadding);
 
     if (width < 200) {
@@ -99,8 +120,8 @@ function drawTaskViewChart(data) {
         .call(xAxis)
 
     function _drawFixedXaxis() {
-        document.getElementById('xaxis-chart').innerHTML = '';
-        
+        clearElement('xaxis-chart', 'container');
+
         d3.select('#xaxis-chart')
             .append('svg')
             .attr('height', 40)
@@ -137,6 +158,7 @@ function drawTaskViewChart(data) {
         story: '#63BA3C',
         task: '#4BADE8',
         bug: '#d62728',
+        epic: '#904ee2',
         'sub-task': '#9467bd'
     }
 

@@ -44,8 +44,28 @@ function drawUserViewChart(cachedData) {
         return [xScale, yScale];
     }
 
+    function getElementIfNotExistCreateNewOne(elementId, containerId) {
+        let element = document.getElementById(elementId);
+        if (!element) {
+            const container = document.getElementById(containerId);
+            element = document.createElement('div');
+            element.setAttribute('id', elementId);
+            container.appendChild(element);
+        }
+
+        return element;
+    }
+
+    function clearElement(elementId, containerId) {
+        let element = getElementIfNotExistCreateNewOne(elementId, containerId);
+        element.innerHTML = '';
+
+        let settingsElement = document.getElementById('setting-container');
+        settingsElement && settingsElement.parentNode.removeChild(settingsElement);
+    }
+
     function _createSvg() {
-        document.getElementById('figure').innerHTML = '';
+        clearElement('figure', 'container');
 
         return d3.select('#figure')
             .append('svg')
@@ -98,7 +118,8 @@ function drawUserViewChart(cachedData) {
     }
 
     function _determineWidthHeight() {
-        let width = document.getElementById('figure').clientWidth - margin.left - margin.right;
+        const figure = getElementIfNotExistCreateNewOne('figure', 'container');
+        let width = figure.clientWidth - margin.left - margin.right;
         let height = ChartHeight().get();
         let barHeight = 24;
 
@@ -331,7 +352,7 @@ function drawUserViewChart(cachedData) {
     }
 
     function _drawFixedXaxis() {
-        document.getElementById('xaxis-chart').innerHTML = '';
+        clearElement('xaxis-chart', 'container');
 
         d3.select('#xaxis-chart')
             .append('svg')

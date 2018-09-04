@@ -1,10 +1,12 @@
 let DATAFIELDS = {
+    isDeveloper: 'IsDeveloper',
+    originalAssignee: 'OriginalAssignee',
+
     assignee: 'Assignee',
     developers: 'Developers',
-    isDeveloper: 'IsDeveloper',
     issueKey: 'Issue key',
     issueType: 'Issue Type',
-    originalAssignee: 'OriginalAssignee',
+    photo: 'Photo',
     plannedStart: 'Custom field (Planned Start)',
     plannedEnd: 'Custom field (Planned End)',
     priority: 'Priority',

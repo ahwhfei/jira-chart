@@ -12,11 +12,24 @@
     const http = require('http');
     const childProcess = require('child_process');
     const cache = require('memory-cache');
+    const config = require('./config');
 
     function forkWorkerProcess() {
-        const worker = childProcess.fork('./worker.promise');
+        let worker;
+        
+        switch (config.workerType) {
+            case 'XML':
+                worker = childProcess.fork('./xml-worker');
+                break;
+            case 'REST':
+                worker = childProcess.fork('./rest-worker');
+                break;
+            default: 
+                break;
+        }
+
         worker.on('message', (data) => {
-            cache.put('cacached', data);
+            cache.put('cacached', {updatedTime: new Date(), data: data});
         });
         worker.on('exit', (code) => {
             console.log(`Worker PID #${worker.pid} Exit with Code: ${code}`);

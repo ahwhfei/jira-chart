@@ -6,45 +6,13 @@
     const xml2js = require('xml2js');
     const parseString = xml2js.parseString;
     
-    const config = require('./config.json');
+    const config = require('./config');
+    const httpsClient = require('./https-client');
 
     let cachedData = [];
     let isDateIntegrity = true;
 
-    console.log(`Worker PID #${process.pid} at ${new Date()}`);
-
-    function fetchJiraData(url) {
-        return new Promise((resolve, reject) => {
-            const urlOptions = new URL(url);
-    
-            const options = {
-                host: urlOptions.host,
-                path: urlOptions.pathname + urlOptions.search,
-                headers: {
-                    'Authorization': 'Basic ' + new Buffer(config.username + ':' + config.password).toString('base64')
-                } 
-            }
-
-            https.get(options, (res) => {
-                const { statusCode } = res;
-
-                if (statusCode !== 200) {
-                    isDateIntegrity = false;
-                    reject({message: `HTTPS GET ${url} Status code is ${statusCode}`});
-                }
-
-                let rawData = '';
-                res.on('data', (chunk) => rawData += chunk);
-
-                res.on('end', () => {
-                    resolve(rawData);
-                });
-            }).on('error', (e) => {
-                isDateIntegrity = false;
-                reject(e);
-            });
-        });
-    }
+    console.log(`XML Worker PID #${process.pid} at ${new Date().toLocaleString()}`);
 
     function _getIssueList(data) {
         let rawData = d3.csvParse(data);
@@ -60,7 +28,7 @@
         list.forEach(issue => {
             let issueUrl = `${url}/${issue}/${issue}.xml`;
 
-            let p = fetchJiraData(issueUrl).then(data => {
+            let p = httpsClient.get(issueUrl).then(data => {
                 return parseIssueXMLData(data);
             }).catch(err => {
                 isDateIntegrity = false;
@@ -174,12 +142,12 @@
 
         const url = config.jiraUrl;
         
-        fetchJiraData(url).then(data => {
+        httpsClient.get(url).then(data => {
             return _getIssueList(data);
         }).then(() => {
             if (isDateIntegrity && cachedData && cachedData.length) {
-                process.send(cachedData);
-                console.log(`Fetched Data Count: ${cachedData.length} records at ${new Date()}`);
+                console.log(`XML worker Fetched Data Count: ${cachedData.length} records at ${new Date().toLocaleString()}`);
+                // process.send(cachedData);
             }
 
             setTimeout(() => run(), config.fetchDataInterval * 1000);
